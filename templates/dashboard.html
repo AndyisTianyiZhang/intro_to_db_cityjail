@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>ZzzCrimeCheck</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div class="topnav">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('login') }}">Search</a>
+      <a href="{{ url_for('about') }}">About Us</a>
+    </div>
+
+    <div class="container">
+      <h2>Search for Criminals</h2>
+      <form method="POST" action="{{ url_for('dashboard') }}">
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name">
+        <br><br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name">
+        <br><br>
+        <input type="submit" value="Search">
+      </form>
+    </div>
+
+  </body>
+</html>

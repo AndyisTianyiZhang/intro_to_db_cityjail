@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>ZzzCrimeCheck</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
+  </head>
+  <body>
+    <div class="topnav">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('login') }}">Search</a>
+      <a href="{{ url_for('about') }}">About Us</a>
+    </div>
+    <div class="title">
+      <center>
+      <h3>Your Best Crime Search Engine</h3>
+      <div class="img">
+        <a href="dashboard.html">
+        <img src = 'static/search.png' alt = 'image of searching'>
+        </a>
+      </div>
+      </center>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
+  </body>
+</html>

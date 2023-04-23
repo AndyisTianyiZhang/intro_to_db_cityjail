@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ZzzCrimeCheck Search Results</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    <table>
+        <tr>
+            <th>Criminal ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Alias</th>
+            <th>Officer First Name</th>
+            <th>Officer Last Name</th>
+            <th>Crime Description</th>
+            <th>Crime Status</th>
+            <th>Appeal Status</th>
+        </tr>
+        {% for criminal in criminals %}
+        <tr>
+            <td>{{ criminal[0] }}</td>
+            <td>{{ criminal[1] }}</td>
+            <td>{{ criminal[2] }}</td>
+            <td>{{ criminal[3] }}</td>
+            <td>{{ criminal[4] }}</td>
+            <td>{{ criminal[5] }}</td>
+            <td>{{ criminal[6] }}</td>
+            <td>{{ criminal[7] }}</td>
+            <td>{{ criminal[8] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
