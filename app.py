@@ -89,57 +89,64 @@ def login_error():
 
 
 # Dashboard
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/dashboard')
 @login_required
 def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
     if request.method == 'POST':
         first_name = request.form['first_name']
         last_name = request.form['last_name']
 
         with mysql.cursor() as cur:
             cur.callproc('GetCriminalDetails', (first_name, last_name))
-            criminals = cur.fetchall()
+            result = cur.fetchall()
+        
+        print("Stored procedure result:", result)  # Debugging line
 
-            cur.execute('SELECT * FROM Officers')
-            officers = cur.fetchall()
+        return render_template('search_results.html', criminals=result)
 
-            cur.execute('SELECT * FROM Crimes')
-            crimes = cur.fetchall()
+    return render_template('search.html')
 
-            cur.execute('SELECT * FROM Crime_Codes')
-            crime_codes = cur.fetchall()
+@app.route('/get_all_criminals')
+@login_required
+def get_all_criminals():
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM Criminals;")
+        result = cur.fetchall()
 
-            cur.execute('SELECT * FROM Crime_Officers')
-            crime_officers = cur.fetchall()
+    return render_template('get_all_criminals.html', criminals=result)
 
-            cur.execute('SELECT * FROM Appeals')
-            appeals = cur.fetchall()
 
-            cur.execute('SELECT * FROM CriminalCharges')
-            criminal_charges = cur.fetchall()
+@app.route('/add_criminal', methods=['GET', 'POST'])
+@login_required
+def add_criminal():
+    if request.method == 'POST':
+        # Retrieve form data
+        criminal_id = request.form['criminal_id']
+        l_name = request.form['l_name']
+        f_name = request.form['f_name']
+        street = request.form['street']
+        city = request.form['city']
+        state = request.form['state']
+        zip = request.form['zip']
+        phone_num = request.form['phone_num']
+        v_status = request.form['v_status']
+        p_status = request.form['p_status']
 
-            cur.execute('SELECT * FROM Aliases')
-            aliases = cur.fetchall()
+        # Insert new criminal into database
+            # Insert new criminal into database
+        with mysql.cursor() as cur:
+            cur.execute('INSERT INTO Criminals (criminal_ID, l_name, f_name, street, city, state, zip, phone_num, V_status, P_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (criminal_id, l_name, f_name, street, city, state, zip, phone_num, v_status, p_status))
+            mysql.commit()
 
-            cur.execute('SELECT * FROM Prob_officers')
-            prob_officers = cur.fetchall()
+        flash('New criminal added successfully!', 'success')
 
-            cur.execute('SELECT * FROM Sentences')
-            sentences = cur.fetchall()
+    return render_template('add_criminal.html')
 
-        return render_template('dashboard.html', 
-                                criminals=criminals,
-                                officers=officers,
-                                crimes=crimes,
-                                crime_codes=crime_codes,
-                                crime_officers=crime_officers,
-                                appeals=appeals,
-                                criminal_charges=criminal_charges,
-                                aliases=aliases,
-                                prob_officers=prob_officers,
-                                sentences=sentences)
-
-    return render_template('dashboard.html')
 
 
 # About page

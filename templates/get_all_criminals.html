@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>All Criminals</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <div class="topnav">
+      <a href="{{ url_for('index') }}">Home</a>
+      <a href="{{ url_for('login') }}">Search</a>
+      <a href="{{ url_for('about') }}">About Us</a>
+    </div>
+
+    <div class="container">
+      <h2>All Criminals</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>Street</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Zip</th>
+            <th>Phone</th>
+            <th>Violent Status</th>
+            <th>Property Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for criminal in criminals %}
+            <tr>
+              <td>{{ criminal[1] }}</td>
+              <td>{{ criminal[2] }}</td>
+              <td>{{ criminal[3] }}</td>
+              <td>{{ criminal[4] }}</td>
+              <td>{{ criminal[5] }}</td>
+              <td>{{ criminal[6] }}</td>
+              <td>{{ criminal[7] }}</td>
+              <td>{{ criminal[8] }}</td>
+              <td>{{ criminal[9] }}</td>
+              <td>{{ criminal[10] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </body>
+</html>
