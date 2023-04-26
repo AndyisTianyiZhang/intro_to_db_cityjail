@@ -48,13 +48,21 @@
             <label for="phone_num">Phone Number:</label>
             <input type="text" id="phone_num" name="phone_num" required>
 
-            <label for="v_status">V Status:</label>
-            <input type="radio" id="v_status" name="v_status" value="Y" checked> Yes
-            <input type="radio" id="v_status" name="v_status" value="N"> No
+            <label for="v_status" class="radio-label">V Status:</label>
+            <div class="radio-options">
+              <input type="radio" id="v_status_yes" name="v_status" value="Y" checked>
+              <label for="v_status_yes">Yes</label>
+              <input type="radio" id="v_status_no" name="v_status" value="N">
+              <label for="v_status_no">No</label>
+            </div>
 
-            <label for="p_status">P Status:</label>
-            <input type="radio" id="p_status" name="p_status" value="Y" checked> Yes
-            <input type="radio" id="p_status" name="p_status" value="N"> No
+            <label for="p_status" class="radio-label">P Status:</label>
+            <div class="radio-options">
+              <input type="radio" id="p_status_yes" name="p_status" value="Y" checked>
+              <label for="p_status_yes">Yes</label>
+              <input type="radio" id="p_status_no" name="p_status" value="N">
+              <label for="p_status_no">No</label>
+            </div>
 
             <input type="submit" value="Add Criminal">
         </form>
