@@ -79,6 +79,40 @@ def login():
 
     return render_template('login.html')
 
+# Route for rendering the sign-up page
+@app.route('/signup_page')
+def signup_page():
+    return render_template('signup.html')
+
+
+# Route for processing the sign-up form data
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+
+    if password != confirm_password:
+        flash('Passwords do not match', 'error')
+        return redirect(url_for('signup_page'))
+
+    cur = mysql.cursor()
+    cur.execute('SELECT * FROM users WHERE username=%s', (username,))
+    result = cur.fetchone()
+
+    if result:
+        flash('Username already exists', 'error')
+        return redirect(url_for('signup_page'))
+
+    cur.execute('INSERT INTO users (username, password) VALUES (%s, %s)', (username, password))
+    mysql.commit()
+    cur.close()
+
+    flash('Account created successfully! Please log in.', 'success')
+    return redirect(url_for('login'))
+
+
+
 # Login error page
 @app.route('/login_error')
 def login_error():
@@ -162,4 +196,5 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port = 8000)
+
