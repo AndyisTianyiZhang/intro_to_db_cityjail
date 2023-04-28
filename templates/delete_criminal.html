@@ -1,13 +1,27 @@
-<!DOCTYPE html>
 {% extends 'base.html' %}
 
 {% block title %}
-  Add Criminal - ZzzCrimeCheck
+  Delete Criminal - ZzzCrimeCheck
 {% endblock %}
 {% block content %}
-
-    <div class="container">
-      <h2>All Criminals</h2>
+    <div class="container_search">
+      <h2>Delete Criminal</h2>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      <form class="form-search" method="POST" action="{{ url_for('delete_criminal') }}">
+        <label for="criminal_id">Criminal ID:</label>
+        <input type="text" id="criminal_id" name="criminal_id" required>
+        <input type="submit" value="Delete">
+      </form>
+      <hr>
+      <h3>All Criminals</h3>
       <div class="table-container">
         <table>
           <thead>
@@ -44,4 +58,3 @@
       </div>
     </div>
 {% endblock %}
-

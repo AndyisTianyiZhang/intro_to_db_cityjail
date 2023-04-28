@@ -4,15 +4,6 @@
   Add Criminal - ZzzCrimeCheck
 {% endblock %}
 {% block content %}
-    <div class="topnav">
-      <a href="{{ url_for('index') }}">Home</a>
-      <a href="{{ url_for('login') }}">Dashboard</a>
-      <a href="{{ url_for('about') }}">About Us</a>
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
-      {% endif %}
-    </div>
-
     <div class="container_search">
       <h2>Search for Criminals</h2>
       <form class="form-search" method="POST" action="{{ url_for('search') }}">

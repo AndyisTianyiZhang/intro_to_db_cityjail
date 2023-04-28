@@ -297,6 +297,8 @@ input[type="submit"]:hover {
   padding: 10px;
   width: 100%;
   margin-bottom: 10px;
+  box-sizing: border-box;
+
 }
 .login-page .login-button {
   background-color: #3897f0;
@@ -361,3 +363,4 @@ input[type="submit"]:hover {
   font-size: 24px;
   margin-top: 10px;
 }
+

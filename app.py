@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 import pymysql
@@ -20,10 +21,11 @@ mysql = pymysql.connect(
 
 # User class for Flask-Login
 class User(UserMixin):
-    def __init__(self, id, username, password):
+    def __init__(self, id, username, password, role):
         self.id = id
         self.username = username
         self.password = password
+        self.role = role
 
     @staticmethod
     def get(user_id):
@@ -33,14 +35,35 @@ class User(UserMixin):
         cur.close()
 
         if result:
-            return User(result[0], result[1], result[2])
+            return User(result[0], result[1], result[2], result[3])
         else:
             return None
+        
+    def is_admin(self):
+        return self.username == 'admin'
+
 
 # Flask-Login user_loader callback
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
+
+# Admin required decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.role != 'admin':
+            flash('You do not have permission to access this page.', 'error')
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Admin dashboard
+@app.route('/admin_dashboard')
+@login_required
+@admin_required
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
 
 # Home page
 @app.route('/')
@@ -51,6 +74,8 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
+        if current_user.role == 'admin':
+            return redirect(url_for('admin_dashboard'))
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username')
@@ -62,7 +87,7 @@ def login():
         cur.close()
 
         if result:
-            user = User(result[0], result[1], result[2])
+            user = User(result[0], result[1], result[2], result[3])  # Include the role in the User constructor
             login_user(user)
             next_page = request.args.get('next', url_for('dashboard'))
             return redirect(next_page)
@@ -71,6 +96,7 @@ def login():
         return redirect(url_for('login'))
 
     return render_template('login.html')
+
 
 # Route for rendering the sign-up page
 @app.route('/signup_page')
@@ -175,6 +201,26 @@ def add_criminal():
         flash('New criminal added successfully!', 'success')
 
     return render_template('add_criminal.html')
+
+@app.route('/delete_criminal', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def delete_criminal():
+    if request.method == 'POST':
+        criminal_id = request.form['criminal_id']
+
+        with mysql.cursor() as cur:
+            cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (criminal_id,))
+            mysql.commit()
+
+        flash('Criminal deleted successfully!', 'success')
+
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM Criminals;")
+        result = cur.fetchall()
+
+    return render_template('delete_criminal.html', criminals = result)
+
 
 
 
