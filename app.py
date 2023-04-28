@@ -111,15 +111,11 @@ def signup():
     flash('Account created successfully! Please log in.', 'success')
     return redirect(url_for('login'))
 
-
-
 # Login error page
 @app.route('/login_error')
 def login_error():
     flash('Invalid username or password', 'error')
     return redirect(url_for('login'))
-
-
 
 
 # Dashboard
