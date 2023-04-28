@@ -47,18 +47,11 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
-# Criminals page
-@app.route('/criminals')
-def get_criminals():
-    cur = mysql.cursor()
-    cur.execute('SELECT * FROM Criminals')
-    result = cur.fetchall()
-    cur.close()
-    return render_template('criminals.html', criminals=result)
-
 # Login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -117,6 +110,12 @@ def login_error():
     flash('Invalid username or password', 'error')
     return redirect(url_for('login'))
 
+# Logout page
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 # Dashboard
 @app.route('/dashboard')
@@ -184,12 +183,12 @@ def add_criminal():
 def about():
     return render_template('Zzz_about.html')
 
-# Logout page
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
+# # Logout page
+# @app.route('/logout')
+# @login_required
+# def logout():
+#     logout_user()
+#     return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port = 8000)

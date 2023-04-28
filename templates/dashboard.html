@@ -1,35 +1,10 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>ZzzCrimeCheck</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-      .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: calc(100% - 50px);
-        padding: 20px;
-      }
-      h2 {
-        font-family: 'Tangerine', cursive;
-        font-size: 48px;
-        margin-bottom: 30px;
-      }
-  </style>
-  </head>
-  <body>
-    <div class="topnav">
-      <a href="{{ url_for('index') }}">Home</a>
-      <a href="{{ url_for('login') }}">Search</a>
-      <a href="{{ url_for('about') }}">About Us</a>
-    </div>
+{% extends 'base.html' %}
 
-    <div class="container">
+{% block title %}
+  Add Criminal - ZzzCrimeCheck
+{% endblock %}
+{% block content %}
+    <div class="dash-container">
       <h2>Dashboard</h2>
       <div class="dashboard-menu">
         <a href="{{ url_for('search') }}" class="dashboard-item">
@@ -43,6 +18,5 @@
         </a>
       </div>
     </div>
+{% endblock %}
 
-  </body>
-</html>

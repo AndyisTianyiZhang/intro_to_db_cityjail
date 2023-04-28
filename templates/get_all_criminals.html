@@ -1,16 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>All Criminals</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  </head>
-  <body>
-    <div class="topnav">
-      <a href="{{ url_for('index') }}">Home</a>
-      <a href="{{ url_for('login') }}">Search</a>
-      <a href="{{ url_for('about') }}">About Us</a>
-    </div>
+{% extends 'base.html' %}
+
+{% block title %}
+  Add Criminal - ZzzCrimeCheck
+{% endblock %}
+{% block content %}
 
     <div class="container">
       <h2>All Criminals</h2>
@@ -49,5 +43,5 @@
         </table>
       </div>
     </div>
-  </body>
-</html>
+{% endblock %}
+

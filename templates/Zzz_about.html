@@ -1,19 +1,9 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>ZzzCrimeCheck</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
-    <link rel="stylesheet" href="static/style.css">
+{% extends 'base.html' %}
 
-  </head>
-  <body>
-    <div class="topnav">
-      <a href="{{ url_for('index') }}">Home</a>
-      <a href="{{ url_for('login') }}">Dashboard</a>
-      <a href="{{ url_for('about') }}">About Us</a>
-    </div>
+{% block title %}
+  Add Criminal - ZzzCrimeCheck
+{% endblock %}
+{% block content %}
 
     <div class="container1">
       <div class = "image">
@@ -53,9 +43,4 @@
         <img src = "static/use.png" alt = "icon of using website">
       </div>
     </div>
-
-
-
-
-    </body>
-  </html>
+  {% endblock %}

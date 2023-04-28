@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>ZzzCrimeCheck</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  </head>
-  <body>
+{% extends 'base.html' %}
+
+{% block title %}
+  Add Criminal - ZzzCrimeCheck
+{% endblock %}
+{% block content %}
     <div class="topnav">
       <a href="{{ url_for('index') }}">Home</a>
-      <a href="{{ url_for('login') }}">Search</a>
+      <a href="{{ url_for('login') }}">Dashboard</a>
       <a href="{{ url_for('about') }}">About Us</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+      {% endif %}
     </div>
 
     <div class="container_search">
@@ -24,5 +23,4 @@
         <input type="submit" value="Search">
       </form>
     </div>
-  </body>
-</html>
+{% endblock %}

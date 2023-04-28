@@ -107,6 +107,11 @@ img {
   */
 }
 
+.logout-link {
+  order: 4;
+}
+
+
 .container2 {
   display: grid;
   align-items: center;
@@ -316,6 +321,15 @@ input[type="submit"]:hover {
   color: #ffffff;
   padding: 10px;
   margin-bottom: 5px;
+}
+
+.dash-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100% - 50px);
+  padding: 20px;
 }
 
 .dashboard-menu {
