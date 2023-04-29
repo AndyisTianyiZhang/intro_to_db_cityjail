@@ -6,6 +6,15 @@
 {% block content %}
     <div class="container_search">
       <h2>Search for Criminals</h2>
+      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
       <form class="form-search" method="POST" action="{{ url_for('search') }}">
         <label for="first_name">First Name:</label>
         <input type="text" id="first_name" name="first_name">

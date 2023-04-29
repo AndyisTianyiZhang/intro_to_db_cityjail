@@ -45,9 +45,6 @@
             <th>Action</th>
           {% endif %}
         </tr>
-        <thead>
-          <!-- Add table headers for criminals here -->
-        </thead>
         <tbody>
           {% for criminal in data['criminals'] %}
             <tr>
@@ -77,7 +74,7 @@
     {% elif data_type == 'officer' %}
       <h2>All Officers</h2>
       {% if current_user.role == 'admin' %}
-            <p><a href="{{ url_for('add_entry', data_type = 'officer') }}">Add a New Officerl</a></p>
+            <p><a href="{{ url_for('add_entry', data_type = 'officer') }}">Add a New Officer</a></p>
       {% endif %}
       <table>
         <!-- Table headers for officers and probation officers -->

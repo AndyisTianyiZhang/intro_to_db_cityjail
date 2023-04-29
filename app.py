@@ -156,9 +156,12 @@ def search():
             cur.callproc('GetCriminalDetails', (first_name, last_name))
             result = cur.fetchall()
         
-        print("Stored procedure result:", result)  # Debugging line
 
-        return render_template('search_results.html', criminals=result)
+        if result[0][0] == "No entries found":
+            flash("No entries found")
+            redirect(url_for('search'))
+        else:
+            return render_template('search_results.html', criminals=result)
 
     return render_template('search.html')
 
