@@ -128,6 +128,14 @@
           <label for="code_description">Code Description:</label>
           <input type="text" id="code_description" name="code_description" required>
           {% endif %}
+          {% if data_type == 'crime_officer' %}
+          <label for="crime_id">Crime ID:</label>
+          <input type="text" id="crime_id" name="crime_id" required>
+
+          <label for="officer_id">Officer ID:</label>
+          <input type="text" id="officer_id" name="officer_id" required>
+          {% endif %}
+
 
           
           <input type="submit" value="Add {{ data_type.capitalize() }}">

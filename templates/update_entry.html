@@ -16,7 +16,7 @@
           </ul>
         {% endif %}
       {% endwith %}
-      <form method="post" action="{{ url_for('update_entry', data_type=data_type, id=entry[0]) }}">
+      <form method="post" action="{{ url_for('update_entry', data_type=data_type, id=entry[0], id2=entry[1] if data_type == 'crime_officer' else None) }}">
         {% if data_type == 'criminal' %}
 
           <label for="l_name">Last Name:</label>
@@ -119,7 +119,14 @@
           <label for="code_description">Code Description:</label>
           <input type="text" id="code_description" name="code_description" value="{{ entry[1] }}" required>
           {% endif %}
+          
+          {% if data_type == 'crime_officer' %}
+          <label for="crime_id">Crime ID:</label>
+          <input type="text" id="crime_id" name="crime_id" value="{{ entry[0] }}" required>
 
+          <label for="officer_id">Officer ID:</label>
+          <input type="text" id="officer_id" name="officer_id" value="{{ entry[1] }}" required>
+          {% endif %}
           <input type="submit" value="Update {{ data_type[:-1].capitalize() }}">
       </form>
     </div>
