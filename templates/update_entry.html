@@ -112,6 +112,14 @@
             <label for="status_inactive">Inactive</label>
           </div>
           {% endif %}
+          {% if data_type == 'crime_code' %}
+          <label for="crime_code">Crime Code:</label>
+          <input type="text" id="crime_code" name="crime_code" value="{{ entry[0] }}" required>
+
+          <label for="code_description">Code Description:</label>
+          <input type="text" id="code_description" name="code_description" value="{{ entry[1] }}" required>
+          {% endif %}
+
           <input type="submit" value="Update {{ data_type[:-1].capitalize() }}">
       </form>
     </div>

@@ -155,7 +155,36 @@
               {% endif %}
             </tr>
           {% endfor %}
-          
+          {% elif data_type == 'crime_code' %}
+          <h2>All Crime Codes</h2>
+          {% if current_user.role == 'admin' %}
+            <p><a href="{{ url_for('add_entry', data_type = 'crime_code') }}">Add a New Crime Code</a></p>
+          {% endif %}
+          <table>
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+              {% if current_user.role == 'admin' %}
+                <th>Action</th>
+              {% endif %}
+            </tr>
+            <tbody>
+            {% for crime_code in data['crime_codes'] %}
+              <tr>
+                <td>{{ crime_code[0] }}</td>
+                <td>{{ crime_code[1] }}</td>
+                {% if current_user.role == 'admin' %}
+                  <td>
+                    <a href="{{ url_for('update_entry', data_type = 'crime_code', id=crime_code[0]) }}" class="btn btn-warning">Update</a>
+                  </td>
+                  <td>
+                    <a href="{{ url_for('delete_entry', data_type = 'crime_code', id=crime_code[0]) }}" class="btn btn-warning">Delete</a>
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+          </table>
         </tbody>
       </table>
     {% endif %}

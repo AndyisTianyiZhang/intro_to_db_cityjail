@@ -182,6 +182,9 @@ def display(data_type):
             elif data_type == 'prob_officer':
                 cur.execute("SELECT * FROM Prob_officers WHERE prob_id = %s", (search_id,))
                 data['prob_officers'] = cur.fetchall()
+            elif data_type == 'crime_code':
+                cur.execute("SELECT * FROM Crime_Codes WHERE crime_code = %s", (search_id,))
+                data['crime_codes'] = cur.fetchall()
         else:
             if data_type == 'criminal':
                 cur.execute("SELECT * FROM Criminals")
@@ -192,6 +195,9 @@ def display(data_type):
             elif data_type == 'prob_officer':
                 cur.execute("SELECT * FROM Prob_officers")
                 data['prob_officers'] = cur.fetchall()
+            elif data_type == 'crime_code':
+                cur.execute("SELECT * FROM Crime_Codes")
+                data['crime_codes'] = cur.fetchall()
 
     return render_template('display.html', data=data, data_type=data_type, search_id=search_id)
 
@@ -231,6 +237,9 @@ def add_entry(data_type):
             phone_num = request.form['phone_num']
             email = request.form['email']
             status = request.form['status']
+        elif data_type == 'crime_code':
+            crime_code = request.form['crime_code']
+            code_description = request.form['code_description']
 
 
         # Insert new entry into database
@@ -241,9 +250,12 @@ def add_entry(data_type):
                 cur.execute('INSERT INTO Officers (officer_id, last, first, precinct, badge, phone, status) VALUES  (%s, %s, %s, %s, %s, %s, %s)', (id, l_name, f_name, precinct, badge, phone_num, status))
             elif data_type == 'prob_officer':
                 cur.execute('INSERT INTO Prob_officers (prob_id, last_name, first_name, street, city, state, zip, phone, email, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (id, l_name, f_name, street, city, state, zip, phone_num, email, status))
+            elif data_type == 'crime_code':
+                cur.execute('INSERT INTO Crime_Codes (crime_code, code_description) VALUES (%s, %s)', (crime_code, code_description))
             else:
                 flash('Invalid data type specified.', 'error')
                 return redirect(url_for('index'))
+            
             mysql.commit()
 
         flash(f'New {data_type[:-1]} added successfully!', 'success')
@@ -252,7 +264,7 @@ def add_entry(data_type):
     return render_template('add_entry.html', data_type =data_type)
 
 
-@app.route('/delete_entry/<string:data_type>/<int:id>', methods=['GET', 'POST'])
+@app.route('/delete_entry/<string:data_type>/<string:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def delete_entry(data_type, id):
@@ -279,10 +291,15 @@ def delete_entry(data_type, id):
         with mysql.cursor() as cur:
             cur.execute('DELETE FROM Sentences WHERE prob_id = %s', (id,))
             cur.execute('DELETE FROM Prob_officers WHERE prob_id = %s', (id,))
-        
+    elif data_type == "crime_code":
+        with mysql.cursor() as cur:
+            cur.execute('DELETE FROM CriminalCharges WHERE crime_code = %s', (id,))
+            cur.execute('DELETE FROM Crime_Codes WHERE crime_code = %s', (id,))
+
     mysql.commit()
 
     flash(f'{data_type} deleted successfully!', 'success')
+
     if data_type == "criminal":
         with mysql.cursor() as cur:
             cur.execute("SELECT * FROM Criminals;")
@@ -292,21 +309,26 @@ def delete_entry(data_type, id):
     elif data_type == "prob_officer":
         with mysql.cursor() as cur:
             cur.execute("SELECT * FROM Prob_officers;")
+    elif data_type == "crime_code":
+        with mysql.cursor() as cur:
+            cur.execute("SELECT * FROM Crime_Codes;")
+    else:
+        flash(f"Error: Invalid data type '{data_type}' specified for deletion.", 'error')
+        return redirect(url_for('display', data_type=data_type))
     
 
     return redirect(url_for('display', data_type=data_type))
 
 
-@app.route('/update_entry/<string:data_type>/<int:id>', methods=['GET', 'POST'])
+@app.route('/update_entry/<string:data_type>/<string:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def update_entry(data_type, id):
     if request.method == 'POST':
-        l_name = request.form['l_name']
-        f_name = request.form['f_name']
-        phone_num = request.form['phone_num']
-
         if data_type == 'criminal':
+            l_name = request.form['l_name']
+            f_name = request.form['f_name']
+            phone_num = request.form['phone_num']
             street = request.form['street']
             city = request.form['city']
             state = request.form['state']
@@ -320,6 +342,9 @@ def update_entry(data_type, id):
                     WHERE criminal_ID = %s
                 """, (l_name, f_name, street, city, state, zip, phone_num, v_status, p_status, id))
         elif data_type == 'officer':
+            l_name = request.form['l_name']
+            f_name = request.form['f_name']
+            phone_num = request.form['phone_num']
             precinct = request.form['precinct']
             badge = request.form['badge']
             status = request.form['status']
@@ -342,6 +367,16 @@ def update_entry(data_type, id):
                     SET last_name = %s, first_name = %s, street = %s, city = %s, state = %s, zip = %s, phone = %s, email = %s, status = %s
                     WHERE prob_id = %s
                 """, (l_name, f_name, street, city, state, zip, phone_num, email, status, id))
+        elif data_type == 'crime_code':
+            crime_code = request.form['crime_code']
+            code_description = request.form['code_description']
+            with mysql.cursor() as cur:
+                cur.execute("""
+                    UPDATE Crime_Codes
+                    SET crime_code = %s, code_description = %s
+                    WHERE crime_code = %s
+                """, (crime_code, code_description, id))
+        
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))
@@ -358,9 +393,12 @@ def update_entry(data_type, id):
             cur.execute("SELECT * FROM Officers WHERE officer_ID = %s", (id,))
         elif data_type == 'prob_officer':
             cur.execute("SELECT * FROM Prob_officers WHERE prob_id = %s", (id,))
+        elif data_type == 'crime_code':
+            cur.execute("SELECT * FROM Crime_Codes WHERE crime_code = %s", (id,))
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))
+        
 
         entry = cur.fetchone()
 
