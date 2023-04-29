@@ -171,31 +171,29 @@ def display(data_type):
     with mysql.cursor() as cur:
         if request.method == 'POST' and request.form.get('action') == 'search':
             search_id = request.form.get('search_id')
-            if data_type == 'criminals':
+            if data_type == 'criminal':
                 cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (search_id,))
                 data['criminals'] = cur.fetchall()
-            elif data_type == 'officers':
+            elif data_type == 'officer':
                 cur.execute("SELECT * FROM Officers WHERE officer_ID = %s", (search_id,))
                 data['officers'] = cur.fetchall()
         else:
-            if data_type == 'criminals':
+            if data_type == 'criminal':
                 cur.execute("SELECT * FROM Criminals")
                 data['criminals'] = cur.fetchall()
-            elif data_type == 'officers':
+            elif data_type == 'officer':
                 cur.execute("SELECT * FROM Officers")
                 data['officers'] = cur.fetchall()
 
     return render_template('display.html', data=data, data_type=data_type, search_id=search_id)
 
-
-
-@app.route('/add_criminal', methods=['GET', 'POST'])
+@app.route('/add_entry/<string:data_type>', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def add_criminal():
+def add_entry(data_type):
     if request.method == 'POST':
         # Retrieve form data
-        criminal_id = request.form['criminal_id']
+        id = request.form['id']
         l_name = request.form['l_name']
         f_name = request.form['f_name']
         street = request.form['street']
@@ -206,16 +204,23 @@ def add_criminal():
         v_status = request.form['v_status']
         p_status = request.form['p_status']
 
-        # Insert new criminal into database
-            # Insert new criminal into database
+        # Insert new entry into database
         with mysql.cursor() as cur:
-            cur.execute('INSERT INTO Criminals (criminal_ID, l_name, f_name, street, city, state, zip, phone_num, V_status, P_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (criminal_id, l_name, f_name, street, city, state, zip, phone_num, v_status, p_status))
+            if data_type == 'criminal':
+                cur.execute('INSERT INTO Criminals (criminal_ID, l_name, f_name, street, city, state, zip, phone_num, V_status, P_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (id, l_name, f_name, street, city, state, zip, phone_num, v_status, p_status))
+            elif data_type == 'officer':
+                # Add your query to insert an officer into the database
+                pass
+            else:
+                flash('Invalid data type specified.', 'error')
+                return redirect(url_for('index'))
             mysql.commit()
 
-        flash('New criminal added successfully!', 'success')
-        return redirect(url_for('display',  data_type='criminals'))
+        flash(f'New {data_type[:-1]} added successfully!', 'success')
+        return redirect(url_for('display', data_type=data_type))
 
-    return render_template('add_criminal.html')
+    return render_template('add_entry.html', data_type =data_type)
+
 
 @app.route('/delete_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
 @login_required
@@ -242,7 +247,7 @@ def delete_criminal(criminal_ID):
     with mysql.cursor() as cur:
         cur.execute("SELECT * FROM Criminals;")
 
-    return redirect(url_for('display',  data_type='criminals'))
+    return redirect(url_for('display',  data_type='criminal'))
 
 
 @app.route('/update_criminal/<int:criminal_ID>', methods=['GET', 'POST'])

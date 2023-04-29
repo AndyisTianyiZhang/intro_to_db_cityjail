@@ -16,14 +16,14 @@
         <a href="{{ url_for('search') }}" class="dashboard-item">
           <h3>Search</h3>
         </a>
-        <a href="{{ url_for('display', data_type='criminals') }}" class="dashboard-item">
+        <a href="{{ url_for('display', data_type='criminal') }}" class="dashboard-item">
         {% if current_user.role == 'admin' %}
           <h3>Manage Criminals</h3>
         {% endif %}
         {% if current_user.role == 'user' %}
           <h3>View all Criminals</h3>
         {% endif %}
-        <a href="{{ url_for('display', data_type='officers') }}" class="dashboard-item">
+        <a href="{{ url_for('display', data_type='officer') }}" class="dashboard-item">
         <h3>View all Officers</h3>
         </a>
       </div>
