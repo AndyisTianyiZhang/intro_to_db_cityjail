@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block title %}
+  Add Criminal - ZzzCrimeCheck
+{% endblock %}
+{% block content %}
+
+    <div class="container">
+      {% if current_user.role == 'admin' %}
+        <h2>Criminals Management</h2>
+      {% endif %}
+      {% if current_user.role == 'user' %}
+        <h2>All Criminals</h2>
+      {% endif %}
+      <div class="table-container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <ul class="flashes">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+        {% if current_user.role == 'admin' %}
+          <p><a href="{{ url_for('add_criminal') }}">Add a New Criminal</a></p>
+        {% endif %}
+        <form method="post" action="{{ url_for('get_all_criminals') }}">
+          <label for="criminal_id">Enter Criminal ID:</label>
+          <input type="number" id="criminal_id" name="criminal_id" required>
+          <input type="hidden" name="action" value="search">
+          <input type="submit" value="Search Criminal">
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Last Name</th>
+              <th>First Name</th>
+              <th>Street</th>
+              <th>City</th>
+              <th>State</th>
+              <th>Zip</th>
+              <th>Phone</th>
+              <th>Violent Status</th>
+              <th>Property Status</th>
+              {% if current_user.role == 'admin' %}
+                <th>Action</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for criminal in criminals %}
+              <tr>
+                <td>{{ criminal[0] }}</td>
+                <td>{{ criminal[1] }}</td>
+                <td>{{ criminal[2] }}</td>
+                <td>{{ criminal[3] }}</td>
+                <td>{{ criminal[4] }}</td>
+                <td>{{ criminal[5] }}</td>
+                <td>{{ criminal[6] }}</td>
+                <td>{{ criminal[7] }}</td>
+                <td>{{ criminal[8] }}</td>
+                <td>{{ criminal[9] }}</td>
+                {% if current_user.role == 'admin' %}
+                  <td>
+                    <a href="{{ url_for('update_criminal', criminal_ID=criminal[0]) }}" class="btn btn-warning">Update</a>
+                  </td>
+                {% endif %}
+                {% if current_user.role == 'admin' %}
+                  <td>
+                    <a href="{{ url_for('delete_criminal', criminal_ID=criminal[0]) }}" class="btn btn-warning">Delete</a>
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endblock %}

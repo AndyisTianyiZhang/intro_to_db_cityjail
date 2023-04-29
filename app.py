@@ -154,5 +154,215 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+<<<<<<< Updated upstream
+=======
+# Dashboard
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/search', methods=['GET', 'POST'])
+@login_required
+def search():
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+
+        with mysql.cursor() as cur:
+            cur.callproc('GetCriminalDetails', (first_name, last_name))
+            result = cur.fetchall()
+        
+        print("Stored procedure result:", result)  # Debugging line
+
+        return render_template('search_results.html', criminals=result)
+
+    return render_template('search.html')
+
+@app.route('/get_all_criminals', methods=['GET', 'POST'])
+@login_required
+def get_all_criminals():
+    searched_criminal_id = None
+
+    with mysql.cursor() as cur:
+        if request.method == 'POST' and request.form.get('action') == 'search':
+            searched_criminal_id = request.form.get('criminal_id')
+            cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (searched_criminal_id,))
+        else:
+            cur.execute("SELECT * FROM Criminals")
+        
+        criminals = cur.fetchall()
+
+    if searched_criminal_id and not any(criminal[0] == int(searched_criminal_id) for criminal in criminals):
+        flash('No criminal record found with the given ID.', 'error')
+
+    return render_template('get_all_criminals.html', criminals=criminals, searched_criminal_id=searched_criminal_id)
+
+
+
+@app.route('/add_criminal', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_criminal():
+    if request.method == 'POST':
+        # Retrieve form data
+        criminal_id = request.form['criminal_id']
+        l_name = request.form['l_name']
+        f_name = request.form['f_name']
+        street = request.form['street']
+        city = request.form['city']
+        state = request.form['state']
+        zip = request.form['zip']
+        phone_num = request.form['phone_num']
+        v_status = request.form['v_status']
+        p_status = request.form['p_status']
+
+        # Insert new criminal into database
+            # Insert new criminal into database
+        with mysql.cursor() as cur:
+            cur.execute('INSERT INTO Criminals (criminal_ID, l_name, f_name, street, city, state, zip, phone_num, V_status, P_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (criminal_id, l_name, f_name, street, city, state, zip, phone_num, v_status, p_status))
+            mysql.commit()
+
+        flash('New criminal added successfully!', 'success')
+        return redirect(url_for('get_all_criminals'))
+
+    return render_template('add_criminal.html')
+
+@app.route('/delete_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def delete_criminal(criminal_ID):
+    with mysql.cursor() as cur:
+        cur.execute('DELETE FROM Aliases WHERE criminal_ID = %s', (criminal_ID,))
+        cur.execute('DELETE FROM Sentences WHERE criminal_ID = %s', (criminal_ID,))
+        
+        cur.execute('SELECT crime_id FROM Crimes WHERE criminal_ID = %s', (criminal_ID,))
+        crime_ids = [row[0] for row in cur.fetchall()]
+        
+        if crime_ids:
+            cur.execute('DELETE FROM Appeals WHERE crime_id IN %s', (tuple(crime_ids),))
+            cur.execute('DELETE FROM CriminalCharges WHERE crime_id IN %s', (tuple(crime_ids),))
+            cur.execute('DELETE FROM Crime_Officers WHERE crime_id IN %s', (tuple(crime_ids),))
+            cur.execute('DELETE FROM Crimes WHERE criminal_ID = %s', (criminal_ID,))
+        
+        cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (criminal_ID,))
+        mysql.commit()
+
+    flash('Criminal deleted successfully!', 'success')
+
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM Criminals;")
+        result = cur.fetchall()
+    return redirect(url_for('get_all_criminals'))
+
+
+@app.route('/update_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_criminal(criminal_ID):
+    if request.method == 'POST':
+        l_name = request.form['l_name']
+        f_name = request.form['f_name']
+        street = request.form['street']
+        city = request.form['city']
+        state = request.form['state']
+        zip = request.form['zip']
+        phone_num = request.form['phone_num']
+        v_status = request.form['v_status']
+        p_status = request.form['p_status']
+
+        with mysql.cursor() as cur:
+            cur.execute("""
+                UPDATE Criminals
+                SET l_name = %s, f_name = %s, street = %s, city = %s, state = %s, zip = %s, phone_num = %s, V_status = %s, P_status = %s
+                WHERE criminal_ID = %s
+            """, (l_name, f_name, street, city, state, zip, phone_num, v_status, p_status, criminal_ID))
+            mysql.commit()
+
+        flash('Criminal information updated successfully!', 'success')
+        return redirect(url_for('get_all_criminals'))
+
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (criminal_ID,))
+        criminal = cur.fetchone()
+
+    if criminal is None:
+        flash('Criminal not found', 'error')
+        return redirect(url_for('get_all_criminals'))
+
+    return render_template('update_criminal.html', criminal=criminal)
+
+
+@app.route('/all_user')
+@login_required
+def all_user():
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM users;")
+        result = cur.fetchall()
+
+    return render_template('all_users.html', users=result)
+
+@app.route('/add_user', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_user():
+    if request.method == 'POST':
+        # Retrieve form data
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+
+        # Insert new user into the database
+        with mysql.cursor() as cur:
+            cur.execute('INSERT INTO users (username, password, role) VALUES (%s, %s, %s)', (username, password, role))
+            mysql.commit()
+
+        flash('New user added successfully!', 'success')
+        return redirect(url_for('all_user'))
+
+    return render_template('add_user.html')
+
+@app.route('/delete_user/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    with mysql.cursor() as cur:
+        cur.execute('DELETE FROM users WHERE id = %s', (user_id,))
+        mysql.commit()
+
+    flash('User deleted successfully!', 'success')
+    return redirect(url_for('all_user'))
+
+@app.route('/update_user/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_user(user_id):
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+
+        with mysql.cursor() as cur:
+            cur.execute("""
+                UPDATE users
+                SET username = %s, password = %s, role = %s
+                WHERE id = %s
+            """, (username, password, role, user_id))
+            mysql.commit()
+
+        flash('User information updated successfully!', 'success')
+        return redirect(url_for('all_user'))
+
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+
+    if user is None:
+        flash('User not found', 'error')
+        return redirect(url_for('all_user'))
+
+    return render_template('update_user.html', user=user)
+
+>>>>>>> Stashed changes
 if __name__ == '__main__':
     app.run(debug=True)
