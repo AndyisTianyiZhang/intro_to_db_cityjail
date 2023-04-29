@@ -13,9 +13,9 @@ login_manager.init_app(app)
 
 # Creating a MySQL database connection
 mysql = pymysql.connect(
-    host='localhost',      # Replace with your MySQL server host
-    user='root',  # Replace with your MySQL username
-    password='',  # Replace with your MySQL password
+    host='localhost',
+    user='root',
+    password='',
     database='city_jail'
 )
 
