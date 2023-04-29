@@ -42,6 +42,10 @@
           <a href="{{ url_for('display', data_type='crime_officer') }}" class="dashboard-item">
           <h3>Manage Crime Officer</h3>
         {% endif %}
+        {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('display', data_type='crime') }}" class="dashboard-item">
+          <h3>Manage Crime</h3>
+        {% endif %}
         </a>
       </div>
     </div>

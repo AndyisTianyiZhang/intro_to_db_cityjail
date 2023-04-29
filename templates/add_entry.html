@@ -135,6 +135,37 @@
           <label for="officer_id">Officer ID:</label>
           <input type="text" id="officer_id" name="officer_id" required>
           {% endif %}
+          {% if data_type == 'crime' %}
+          <label for="crime_id">Crime ID:</label>
+          <input type="text" id="crime_id" name="crime_id" required>
+
+          <label for="criminal_id">Criminal ID:</label>
+          <input type="text" id="criminal_id" name="criminal_id" required>
+
+          <label for="classification">Classification:</label>
+          <select id="classification" name="classification" required>
+              <option value="F">F</option>
+              <option value="M">M</option>
+              <option value="O">O</option>
+              <option value="U">U</option>
+          </select>
+
+          <label for="date_charged">Date Charged:</label>
+          <input type="date" id="date_charged" name="date_charged" required>
+
+          <label for="status">Status:</label>
+          <select id="status" name="status" required>
+              <option value="CL">CL</option>
+              <option value="CA">CA</option>
+              <option value="IA">IA</option>
+          </select>
+
+          <label for="hearing_date">Hearing Date:</label>
+          <input type="date" id="hearing_date" name="hearing_date" required>
+
+          <label for="appeal_cutoff_date">Appeal Cutoff Date:</label>
+          <input type="date" id="appeal_cutoff_date" name="appeal_cutoff_date" required>
+          {% endif %}
 
 
           

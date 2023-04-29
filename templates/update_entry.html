@@ -127,6 +127,34 @@
           <label for="officer_id">Officer ID:</label>
           <input type="text" id="officer_id" name="officer_id" value="{{ entry[1] }}" required>
           {% endif %}
+          {% if data_type == 'crime' %}
+          <label for="criminal_id">Criminal ID:</label>
+          <input type="text" id="criminal_id" name="criminal_id" value="{{ entry[1] }}" required>
+
+          <label for="classification">Classification:</label>
+          <select id="classification" name="classification" required>
+            <option value="F" {% if entry[2] == 'F' %}selected{% endif %}>F</option>
+            <option value="M" {% if entry[2] == 'M' %}selected{% endif %}>M</option>
+            <option value="O" {% if entry[2] == 'O' %}selected{% endif %}>O</option>
+            <option value="U" {% if entry[2] == 'U' %}selected{% endif %}>U</option>
+          </select>
+
+          <label for="date_charged">Date Charged:</label>
+          <input type="date" id="date_charged" name="date_charged" value="{{ entry[3] }}" required>
+          <label for="status">Status:</label>
+          <select id="status" name="status" required>
+            <option value="CL" {% if entry[4] == 'CL' %}selected{% endif %}>CL</option>
+            <option value="CA" {% if entry[4] == 'CA' %}selected{% endif %}>CA</option>
+            <option value="IA" {% if entry[4] == 'IA' %}selected{% endif %}>IA</option>
+          </select>
+          
+          <label for="hearing_date">Hearing Date:</label>
+          <input type="date" id="hearing_date" name="hearing_date" value="{{ entry[5] }}">
+          
+          <label for="appeal_cutoff_date">Appeal Cutoff Date:</label>
+          <input type="date" id="appeal_cutoff_date" name="appeal_cutoff_date" value="{{ entry[6] }}">
+    
+          {% endif %}
           <input type="submit" value="Update {{ data_type[:-1].capitalize() }}">
       </form>
     </div>
