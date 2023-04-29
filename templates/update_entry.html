@@ -6,7 +6,7 @@
 
 {% block content %}
   <div class="container">
-      <h2>Update {{ data_type[:-1].capitalize() }}</h2>
+      <h2>Update {{ data_type.capitalize() }}</h2>
       {% with messages = get_flashed_messages() %}
         {% if messages %}
           <ul class="flashes">

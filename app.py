@@ -267,7 +267,7 @@ def delete_entry(data_type, id):
             cur.execute("SELECT * FROM Officers;")
     
 
-    return redirect(url_for('display',  data_type='criminal'))
+    return redirect(url_for('display', data_type=data_type))
 
 
 @app.route('/update_entry/<string:data_type>/<int:id>', methods=['GET', 'POST'])
