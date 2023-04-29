@@ -30,7 +30,6 @@
             <p><a href="{{ url_for('add_entry', data_type = 'criminal') }}">Add a New Criminal</a></p>
       {% endif %}
       <table>
-        <!-- Table headers for criminals -->
         <tr>
           <th>ID</th>
           <th>Last Name</th>
@@ -109,7 +108,6 @@
               <td>{{ officer[4] }}</td>
               <td>{{ officer[5] }}</td>
               <td>{{ officer[6] }}</td>
-              <td>{{ officer[7] }}</td>
               {% if current_user.role == 'admin' %}
                 <td>
                   <a href="{{ url_for('update_entry', data_type = 'officer', id=officer[0]) }}" class="btn btn-warning">Update</a>
