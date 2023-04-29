@@ -77,6 +77,9 @@
     </table>
   {% elif data_type == 'officer' %}
     <h2>All Officers and Probation Officers</h2>
+    {% if current_user.role == 'admin' %}
+          <p><a href="{{ url_for('add_entry', data_type = 'officer') }}">Add a New Criminal</a></p>
+    {% endif %}
     <table>
       <!-- Table headers for officers and probation officers -->
       <!-- Table headers for criminals -->
@@ -107,16 +110,6 @@
             <td>{{ officer[5] }}</td>
             <td>{{ officer[6] }}</td>
             <td>{{ officer[7] }}</td>
-            {% if current_user.role == 'admin' %}
-                  <td>
-                    <a href="{{ url_for('update_criminal', officer_ID=officer[0]) }}" class="btn btn-warning">Update</a>
-                  </td>
-                {% endif %}
-                {% if current_user.role == 'admin' %}
-                  <td>
-                    <a href="{{ url_for('delete_criminal', officer_ID=officer[0]) }}" class="btn btn-warning">Delete</a>
-                  </td>
-                {% endif %}
           </tr>
         {% endfor %}
         {% for prob_officer in data['prob_officers'] %}

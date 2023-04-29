@@ -193,16 +193,26 @@ def display(data_type):
 def add_entry(data_type):
     if request.method == 'POST':
         # Retrieve form data
-        id = request.form['id']
-        l_name = request.form['l_name']
-        f_name = request.form['f_name']
-        street = request.form['street']
-        city = request.form['city']
-        state = request.form['state']
-        zip = request.form['zip']
-        phone_num = request.form['phone_num']
-        v_status = request.form['v_status']
-        p_status = request.form['p_status']
+        if data_type == 'criminal':
+            id = request.form['id']
+            l_name = request.form['l_name']
+            f_name = request.form['f_name']
+            street = request.form['street']
+            city = request.form['city']
+            state = request.form['state']
+            zip = request.form['zip']
+            phone_num = request.form['phone_num']
+            v_status = request.form['v_status']
+            p_status = request.form['p_status']
+        elif data_type == 'officer':
+            id = request.form['id']
+            l_name = request.form['l_name']
+            f_name = request.form['f_name']
+            precinct = request.form['precinct']
+            badge = request.form['badge']
+            phone_num = request.form['phone_num']
+            status = request.form['status']
+
 
         # Insert new entry into database
         with mysql.cursor() as cur:
@@ -210,7 +220,7 @@ def add_entry(data_type):
                 cur.execute('INSERT INTO Criminals (criminal_ID, l_name, f_name, street, city, state, zip, phone_num, V_status, P_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (id, l_name, f_name, street, city, state, zip, phone_num, v_status, p_status))
             elif data_type == 'officer':
                 # Add your query to insert an officer into the database
-                pass
+                cur.execute('INSERT INTO Officers (officer_id, last, first, precinct, badge, phone, status) VALUES  (%s, %s, %s, %s, %s, %s, %s)', (id, l_name, f_name, precinct, badge, phone_num, status))
             else:
                 flash('Invalid data type specified.', 'error')
                 return redirect(url_for('index'))
@@ -250,6 +260,22 @@ def delete_criminal(criminal_ID):
     return redirect(url_for('display',  data_type='criminal'))
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/update_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -283,6 +309,28 @@ def update_criminal(criminal_ID):
     if criminal is None:
         flash('Criminal not found', 'error')
     return render_template('update_criminal.html', criminal=criminal)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/all_user')

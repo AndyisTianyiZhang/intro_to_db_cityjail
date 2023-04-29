@@ -44,7 +44,7 @@
 
           <label for="v_status" class="radio-label">V Status:</label>
           <div class="radio-options">
-            <input type="radio" id="v_status_yes" name="v_status" value="Y" checked>
+            <input type="radio" id="v_status_yes" name="v_status" value="Y">
             <label for="v_status_yes">Yes</label>
             <input type="radio" id="v_status_no" name="v_status" value="N">
             <label for="v_status_no">No</label>
@@ -52,10 +52,37 @@
 
           <label for="p_status" class="radio-label">P Status:</label>
           <div class="radio-options">
-            <input type="radio" id="p_status_yes" name="p_status" value="Y" checked>
+            <input type="radio" id="p_status_yes" name="p_status" value="Y">
             <label for="p_status_yes">Yes</label>
             <input type="radio" id="p_status_no" name="p_status" value="N">
             <label for="p_status_no">No</label>
+          </div>
+        {% endif %}
+        {% if data_type == 'officer' %}
+          <label for="id">{{ data_type.capitalize() }} ID:</label>
+          <input type="text" id="id" name="id" required>
+
+          <label for="l_name">Last Name:</label>
+          <input type="text" id="l_name" name="l_name" required>
+
+          <label for="f_name">First Name:</label>
+          <input type="text" id="f_name" name="f_name" required>
+
+          <label for="precinct">Precinct:</label>
+          <input type="text" id="precinct" name="precinct" required>
+
+          <label for="badge">Badge:</label>
+          <input type="text" id="badge" name="badge" required>
+
+          <label for="phone_num">Phone Number:</label>
+          <input type="text" id="phone_num" name="phone_num" required>
+
+          <label for="status" class="radio-label">V Status:</label>
+          <div class="radio-options">
+            <input type="radio" id="status_active" name="active" value="A">
+            <label for="status_yes">Yes</label>
+            <input type="radio" id="status_inactive" name="status" value="I">
+            <label for="status_no">No</label>
           </div>
         {% endif %}
 
