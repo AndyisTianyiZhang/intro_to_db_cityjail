@@ -12,7 +12,7 @@ body {
 .topnav {
   font-family: 'Montserrat', sans-serif;
   position: fixed;
-  padding: 0;
+  padding: 0 20px;
   margin: 0;
   top: 0;
   left: 0;
@@ -20,7 +20,23 @@ body {
   background-color: #f6f7f895;
   z-index: 999;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.menu-links-container {
+  display: flex;
+  align-items: center;
+}
+
+.auth-links-container {
+  display: flex;
+  align-items: center;
+  margin-right: 30px;
+}
+
+
 
 
 .topnav a {

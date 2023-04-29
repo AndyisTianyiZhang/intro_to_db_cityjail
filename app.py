@@ -40,7 +40,7 @@ class User(UserMixin):
             return None
         
     def is_admin(self):
-        return self.username == 'admin'
+        return self.role == 'admin'
 
 
 # Flask-Login user_loader callback
@@ -57,6 +57,11 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+
+# About page
+@app.route('/about')
+def about():
+    return render_template('Zzz_about.html')
 
 # Admin dashboard
 @app.route('/admin_dashboard')
@@ -76,7 +81,8 @@ def login():
     if current_user.is_authenticated:
         if current_user.role == 'admin':
             return redirect(url_for('admin_dashboard'))
-        return redirect(url_for('dashboard'))
+        else:
+            return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -87,9 +93,12 @@ def login():
         cur.close()
 
         if result:
-            user = User(result[0], result[1], result[2], result[3])  # Include the role in the User constructor
+            user = User(result[0], result[1], result[2], result[3])
             login_user(user)
-            next_page = request.args.get('next', url_for('dashboard'))
+            if user.is_admin():
+                next_page = request.args.get('next', url_for('admin_dashboard'))
+            else:
+                next_page = request.args.get('next', url_for('dashboard'))
             return redirect(next_page)
 
         flash('Invalid username or password', 'error')
@@ -269,11 +278,79 @@ def update_criminal(criminal_ID):
     return render_template('update_criminal.html', criminal=criminal)
 
 
+@app.route('/all_user')
+@login_required
+def all_user():
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM users;")
+        result = cur.fetchall()
 
-# About page
-@app.route('/about')
-def about():
-    return render_template('Zzz_about.html')
+    return render_template('all_users.html', users=result)
+
+@app.route('/add_user', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_user():
+    if request.method == 'POST':
+        # Retrieve form data
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+
+        # Insert new user into the database
+        with mysql.cursor() as cur:
+            cur.execute('INSERT INTO users (username, password, role) VALUES (%s, %s, %s)', (username, password, role))
+            mysql.commit()
+
+        flash('New user added successfully!', 'success')
+        return redirect(url_for('all_user'))
+
+    return render_template('add_user.html')
+
+@app.route('/delete_user/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    with mysql.cursor() as cur:
+        cur.execute('DELETE FROM users WHERE id = %s', (user_id,))
+        mysql.commit()
+
+    flash('User deleted successfully!', 'success')
+    return redirect(url_for('all_user'))
+
+@app.route('/update_user/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_user(user_id):
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form['role']
+
+        with mysql.cursor() as cur:
+            cur.execute("""
+                UPDATE users
+                SET username = %s, password = %s, role = %s
+                WHERE id = %s
+            """, (username, password, role, user_id))
+            mysql.commit()
+
+        flash('User information updated successfully!', 'success')
+        return redirect(url_for('all_user'))
+
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        user = cur.fetchone()
+
+    if user is None:
+        flash('User not found', 'error')
+        return redirect(url_for('all_user'))
+
+    return render_template('update_user.html', user=user)
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port = 8000)
