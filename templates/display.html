@@ -48,7 +48,6 @@
         <tbody>
           {% for criminal in data['criminals'] %}
             <tr>
-              <!-- Add table data for criminals here -->
               <td>{{ criminal[0] }}</td>
               <td>{{ criminal[1] }}</td>
               <td>{{ criminal[2] }}</td>
@@ -91,9 +90,6 @@
             <th>Action</th>
           {% endif %}
         </tr>
-        <thead>
-          <!-- Add table headers for officers and probation officers here -->
-        </thead>
         <tbody>
           {% for officer in data['officers'] %}
             <tr>
@@ -115,11 +111,51 @@
               {% endif %}
             </tr>
           {% endfor %}
+          {% elif data_type == 'prob_officer' %}
+          <h2>All Probation officer</h2>
+          {% if current_user.role == 'admin' %}
+                <p><a href="{{ url_for('add_entry', data_type = 'prob_officer') }}">Add a New Probation Officer</a></p>
+          {% endif %}
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>Last Name</th>
+              <th>First Name</th>
+              <th>Street</th>
+              <th>City</th>
+              <th>State</th>
+              <th>Zip Code</th>
+              <th>Phone number</th>
+              <th>Email Address</th>
+              <th>Status</th>
+              {% if current_user.role == 'admin' %}
+                <th>Action</th>
+              {% endif %}
+            </tr>
+            <tbody>
           {% for prob_officer in data['prob_officers'] %}
             <tr>
-              <!-- Add table data for probation officers here -->
+              <td>{{ prob_officer[0] }}</td>
+              <td>{{ prob_officer[1] }}</td>
+              <td>{{ prob_officer[2] }}</td>
+              <td>{{ prob_officer[3] }}</td>
+              <td>{{ prob_officer[4] }}</td>
+              <td>{{ prob_officer[5] }}</td>
+              <td>{{ prob_officer[6] }}</td>
+              <td>{{ prob_officer[7] }}</td>
+              <td>{{ prob_officer[8] }}</td>
+              <td>{{ prob_officer[9] }}</td>
+              {% if current_user.role == 'admin' %}
+                <td>
+                  <a href="{{ url_for('update_entry', data_type = 'prob_officer', id=prob_officer[0]) }}" class="btn btn-warning">Update</a>
+                </td>
+                <td>
+                  <a href="{{ url_for('delete_entry', data_type = 'prob_officer', id=prob_officer[0]) }}" class="btn btn-warning">Delete</a>
+                </td>
+              {% endif %}
             </tr>
           {% endfor %}
+          
         </tbody>
       </table>
     {% endif %}

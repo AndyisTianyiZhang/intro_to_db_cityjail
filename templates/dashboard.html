@@ -22,9 +22,15 @@
         {% elif current_user.role == 'user' %}
           <h3>View all Criminals</h3>
         {% endif %}
-          {% if current_user.role == 'admin' %}
+
+        {% if current_user.role == 'admin' %}
           <a href="{{ url_for('display', data_type='officer') }}" class="dashboard-item">
           <h3>Manage Officers</h3>
+        {% endif %}
+
+        {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('display', data_type='prob_officer') }}" class="dashboard-item">
+          <h3>Manage Probation Officers</h3>
         {% endif %}
         </a>
       </div>

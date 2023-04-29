@@ -79,7 +79,39 @@
             <label for="status_inactive">Inactive</label>
           </div>
           {% endif %}
-    
+          {% if data_type == 'prob_officer' %}
+          <label for="l_name">Last Name:</label>
+          <input type="text" id="l_name" name="l_name" value="{{ entry[1] }}" required>
+
+          <label for="f_name">First Name:</label>
+          <input type="text" id="f_name" name="f_name" value="{{ entry[2] }}" required>
+
+          <label for="street">Street:</label>
+          <input type="text" id="street" name="street" value="{{ entry[3] }}" required>
+
+          <label for="city">City:</label>
+          <input type="text" id="city" name="city" value="{{ entry[4] }}" required>
+
+          <label for="state">State:</label>
+          <input type="text" id="state" name="state" value="{{ entry[5] }}" required>
+
+          <label for="zip">Zip:</label>
+          <input type="text" id="zip" name="zip" value="{{ entry[6] }}" required>
+
+          <label for="phone_num">Phone Number:</label>
+          <input type="text" id="phone_num" name="phone_num" value="{{ entry[7] }}" required>
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" value="{{ entry[8] }}" required>
+
+          <label for="status" class="radio-label">Status:</label>
+          <div class="radio-options">
+            <input type="radio" id="status_active" name="status" value="A" {% if entry[9] == 'A' %}checked{% endif %}>
+            <label for="status_active">Active</label>
+            <input type="radio" id="status_inactive" name="status" value="I" {% if entry[9] == 'I' %}checked{% endif %}>
+            <label for="status_inactive">Inactive</label>
+          </div>
+          {% endif %}
           <input type="submit" value="Update {{ data_type[:-1].capitalize() }}">
       </form>
     </div>
