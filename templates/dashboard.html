@@ -19,12 +19,13 @@
         <a href="{{ url_for('display', data_type='criminal') }}" class="dashboard-item">
         {% if current_user.role == 'admin' %}
           <h3>Manage Criminals</h3>
-        {% endif %}
-        {% if current_user.role == 'user' %}
+        {% elif current_user.role == 'user' %}
           <h3>View all Criminals</h3>
         {% endif %}
-        <a href="{{ url_for('display', data_type='officer') }}" class="dashboard-item">
-        <h3>View all Officers</h3>
+          {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('display', data_type='officer') }}" class="dashboard-item">
+          <h3>Manage Officers</h3>
+        {% endif %}
         </a>
       </div>
     </div>
