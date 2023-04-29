@@ -7,8 +7,25 @@
 {% block content %}
 
     <div class="container">
-      <h2>All Criminals</h2>
+      {% if current_user.role == 'admin' %}
+        <h2>Criminals Management</h2>
+      {% endif %}
+      {% if current_user.role == 'user' %}
+        <h2>All Criminals</h2>
+      {% endif %}
       <div class="table-container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <ul class="flashes">
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+        {% if current_user.role == 'admin' %}
+          <p><a href="{{ url_for('add_criminal') }}">Add a New Criminal</a></p>
+        {% endif %}
         <table>
           <thead>
             <tr>
@@ -43,6 +60,11 @@
                 {% if current_user.role == 'admin' %}
                   <td>
                     <a href="{{ url_for('update_criminal', criminal_ID=criminal[0]) }}" class="btn btn-warning">Update</a>
+                  </td>
+                {% endif %}
+                {% if current_user.role == 'admin' %}
+                  <td>
+                    <a href="{{ url_for('delete_criminal', criminal_ID=criminal[0]) }}" class="btn btn-warning">Delete</a>
                   </td>
                 {% endif %}
               </tr>

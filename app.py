@@ -200,39 +200,36 @@ def add_criminal():
             mysql.commit()
 
         flash('New criminal added successfully!', 'success')
+        return redirect(url_for('get_all_criminals'))
 
     return render_template('add_criminal.html')
 
-@app.route('/delete_criminal', methods=['GET', 'POST'])
+@app.route('/delete_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def delete_criminal():
-    if request.method == 'POST':
-        criminal_id = request.form['criminal_id']
+def delete_criminal(criminal_ID):
+    with mysql.cursor() as cur:
+        cur.execute('DELETE FROM Aliases WHERE criminal_ID = %s', (criminal_ID,))
+        cur.execute('DELETE FROM Sentences WHERE criminal_ID = %s', (criminal_ID,))
+        
+        cur.execute('SELECT crime_id FROM Crimes WHERE criminal_ID = %s', (criminal_ID,))
+        crime_ids = [row[0] for row in cur.fetchall()]
+        
+        if crime_ids:
+            cur.execute('DELETE FROM Appeals WHERE crime_id IN %s', (tuple(crime_ids),))
+            cur.execute('DELETE FROM CriminalCharges WHERE crime_id IN %s', (tuple(crime_ids),))
+            cur.execute('DELETE FROM Crime_Officers WHERE crime_id IN %s', (tuple(crime_ids),))
+            cur.execute('DELETE FROM Crimes WHERE criminal_ID = %s', (criminal_ID,))
+        
+        cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (criminal_ID,))
+        mysql.commit()
 
-        with mysql.cursor() as cur:
-            cur.execute('DELETE FROM Aliases WHERE criminal_ID = %s', (criminal_id,))
-            cur.execute('DELETE FROM Sentences WHERE criminal_ID = %s', (criminal_id,))
-            
-            cur.execute('SELECT crime_id FROM Crimes WHERE criminal_ID = %s', (criminal_id,))
-            crime_ids = [row[0] for row in cur.fetchall()]
-            
-            if crime_ids:
-                cur.execute('DELETE FROM Appeals WHERE crime_id IN %s', (tuple(crime_ids),))
-                cur.execute('DELETE FROM CriminalCharges WHERE crime_id IN %s', (tuple(crime_ids),))
-                cur.execute('DELETE FROM Crime_Officers WHERE crime_id IN %s', (tuple(crime_ids),))
-                cur.execute('DELETE FROM Crimes WHERE criminal_ID = %s', (criminal_id,))
-            
-            cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (criminal_id,))
-            mysql.commit()
-
-        flash('Criminal deleted successfully!', 'success')
+    flash('Criminal deleted successfully!', 'success')
 
     with mysql.cursor() as cur:
         cur.execute("SELECT * FROM Criminals;")
         result = cur.fetchall()
-
-    return render_template('delete_criminal.html', criminals=result)
+    return redirect(url_for('get_all_criminals'))
 
 
 @app.route('/update_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
