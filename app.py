@@ -175,14 +175,24 @@ def search():
 
     return render_template('search.html')
 
-@app.route('/get_all_criminals')
+@app.route('/get_all_criminals', methods=['GET', 'POST'])
 @login_required
 def get_all_criminals():
-    with mysql.cursor() as cur:
-        cur.execute("SELECT * FROM Criminals;")
-        result = cur.fetchall()
+    searched_criminal_id = None
 
-    return render_template('get_all_criminals.html', criminals=result)
+    with mysql.cursor() as cur:
+        if request.method == 'POST' and request.form.get('action') == 'search':
+            searched_criminal_id = request.form.get('criminal_id')
+            cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (searched_criminal_id,))
+        else:
+            cur.execute("SELECT * FROM Criminals")
+        
+        criminals = cur.fetchall()
+
+    if searched_criminal_id and not any(criminal[0] == int(searched_criminal_id) for criminal in criminals):
+        flash('No criminal record found with the given ID.', 'error')
+
+    return render_template('get_all_criminals.html', criminals=criminals, searched_criminal_id=searched_criminal_id)
 
 
 @app.route('/add_criminal', methods=['GET', 'POST'])
