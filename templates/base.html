@@ -11,7 +11,7 @@
       <div class="menu-links-container">
         <a href="{{ url_for('index') }}">Home</a>
         {% if current_user.role == 'admin' %}
-          <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+          <a href="{{ url_for('dashboard') }}">Admin Dashboard</a>
         {% endif %}
         {% if current_user.role == 'user' %}
           <a href="{{ url_for('dashboard') }}">Dashboard</a>

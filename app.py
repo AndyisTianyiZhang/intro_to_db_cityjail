@@ -63,13 +63,6 @@ def admin_required(f):
 def about():
     return render_template('Zzz_about.html')
 
-# Admin dashboard
-@app.route('/admin_dashboard')
-@login_required
-@admin_required
-def admin_dashboard():
-    return render_template('admin_dashboard.html')
-
 # Home page
 @app.route('/')
 def index():
@@ -79,10 +72,7 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        if current_user.role == 'admin':
-            return redirect(url_for('admin_dashboard'))
-        else:
-            return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -95,10 +85,7 @@ def login():
         if result:
             user = User(result[0], result[1], result[2], result[3])
             login_user(user)
-            if user.is_admin():
-                next_page = request.args.get('next', url_for('admin_dashboard'))
-            else:
-                next_page = request.args.get('next', url_for('dashboard'))
+            next_page = request.args.get('next', url_for('dashboard'))
             return redirect(next_page)
 
         flash('Invalid username or password', 'error')
@@ -175,24 +162,31 @@ def search():
 
     return render_template('search.html')
 
-@app.route('/get_all_criminals', methods=['GET', 'POST'])
+@app.route('/display/<string:data_type>', methods=['GET', 'POST'])
 @login_required
-def get_all_criminals():
-    searched_criminal_id = None
+def display(data_type):
+    search_id = None
+    data = {}
 
     with mysql.cursor() as cur:
         if request.method == 'POST' and request.form.get('action') == 'search':
-            searched_criminal_id = request.form.get('criminal_id')
-            cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (searched_criminal_id,))
+            search_id = request.form.get('search_id')
+            if data_type == 'criminals':
+                cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (search_id,))
+                data['criminals'] = cur.fetchall()
+            elif data_type == 'officers':
+                cur.execute("SELECT * FROM Officers WHERE officer_ID = %s", (search_id,))
+                data['officers'] = cur.fetchall()
         else:
-            cur.execute("SELECT * FROM Criminals")
-        
-        criminals = cur.fetchall()
+            if data_type == 'criminals':
+                cur.execute("SELECT * FROM Criminals")
+                data['criminals'] = cur.fetchall()
+            elif data_type == 'officers':
+                cur.execute("SELECT * FROM Officers")
+                data['officers'] = cur.fetchall()
 
-    if searched_criminal_id and not any(criminal[0] == int(searched_criminal_id) for criminal in criminals):
-        flash('No criminal record found with the given ID.', 'error')
+    return render_template('display.html', data=data, data_type=data_type, search_id=search_id)
 
-    return render_template('get_all_criminals.html', criminals=criminals, searched_criminal_id=searched_criminal_id)
 
 
 @app.route('/add_criminal', methods=['GET', 'POST'])
@@ -219,7 +213,7 @@ def add_criminal():
             mysql.commit()
 
         flash('New criminal added successfully!', 'success')
-        return redirect(url_for('get_all_criminals'))
+        return redirect(url_for('display',  data_type='criminals'))
 
     return render_template('add_criminal.html')
 
@@ -247,8 +241,8 @@ def delete_criminal(criminal_ID):
 
     with mysql.cursor() as cur:
         cur.execute("SELECT * FROM Criminals;")
-        result = cur.fetchall()
-    return redirect(url_for('get_all_criminals'))
+
+    return redirect(url_for('display',  data_type='criminals'))
 
 
 @app.route('/update_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
@@ -275,7 +269,7 @@ def update_criminal(criminal_ID):
             mysql.commit()
 
         flash('Criminal information updated successfully!', 'success')
-        return redirect(url_for('get_all_criminals'))
+        return redirect(url_for('display',  data_type='criminals'))
 
     with mysql.cursor() as cur:
         cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (criminal_ID,))
@@ -283,8 +277,6 @@ def update_criminal(criminal_ID):
 
     if criminal is None:
         flash('Criminal not found', 'error')
-        return redirect(url_for('get_all_criminals'))
-
     return render_template('update_criminal.html', criminal=criminal)
 
 
