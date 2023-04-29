@@ -232,101 +232,97 @@ def add_entry(data_type):
     return render_template('add_entry.html', data_type =data_type)
 
 
-@app.route('/delete_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
+@app.route('/delete_entry/<string:data_type>/<int:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def delete_criminal(criminal_ID):
-    with mysql.cursor() as cur:
-        cur.execute('DELETE FROM Aliases WHERE criminal_ID = %s', (criminal_ID,))
-        cur.execute('DELETE FROM Sentences WHERE criminal_ID = %s', (criminal_ID,))
+def delete_entry(data_type, id):
+    if data_type == "criminal":
+        with mysql.cursor() as cur:
+            cur.execute('DELETE FROM Aliases WHERE criminal_ID = %s', (id,))
+            cur.execute('DELETE FROM Sentences WHERE criminal_ID = %s', (id,))
+            
+            cur.execute('SELECT crime_id FROM Crimes WHERE criminal_ID = %s', (id,))
+            crime_ids = [row[0] for row in cur.fetchall()]
+            
+            if crime_ids:
+                cur.execute('DELETE FROM Appeals WHERE crime_id IN %s', (tuple(crime_ids),))
+                cur.execute('DELETE FROM CriminalCharges WHERE crime_id IN %s', (tuple(crime_ids),))
+                cur.execute('DELETE FROM Crime_Officers WHERE crime_id IN %s', (tuple(crime_ids),))
+                cur.execute('DELETE FROM Crimes WHERE criminal_ID = %s', (id,))
         
-        cur.execute('SELECT crime_id FROM Crimes WHERE criminal_ID = %s', (criminal_ID,))
-        crime_ids = [row[0] for row in cur.fetchall()]
-        
-        if crime_ids:
-            cur.execute('DELETE FROM Appeals WHERE crime_id IN %s', (tuple(crime_ids),))
-            cur.execute('DELETE FROM CriminalCharges WHERE crime_id IN %s', (tuple(crime_ids),))
-            cur.execute('DELETE FROM Crime_Officers WHERE crime_id IN %s', (tuple(crime_ids),))
-            cur.execute('DELETE FROM Crimes WHERE criminal_ID = %s', (criminal_ID,))
-        
-        cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (criminal_ID,))
-        mysql.commit()
+            cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (id,))
+    elif data_type == "officer":
+        with mysql.cursor() as cur:
+            cur.execute('DELETE FROM Crime_Officers WHERE officer_id = %s', (id,))
+            cur.execute('DELETE FROM Officers WHERE officer_id = %s', (id,))
 
-    flash('Criminal deleted successfully!', 'success')
+    mysql.commit()
 
-    with mysql.cursor() as cur:
-        cur.execute("SELECT * FROM Criminals;")
+    flash(f'{data_type} deleted successfully!', 'success')
+    if data_type == "criminal":
+        with mysql.cursor() as cur:
+            cur.execute("SELECT * FROM Criminals;")
+    elif data_type == "officer":
+        with mysql.cursor() as cur:
+            cur.execute("SELECT * FROM Officers;")
+    
 
     return redirect(url_for('display',  data_type='criminal'))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/update_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
+@app.route('/update_entry/<string:data_type>/<int:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def update_criminal(criminal_ID):
+def update_entry(data_type, id):
     if request.method == 'POST':
         l_name = request.form['l_name']
         f_name = request.form['f_name']
-        street = request.form['street']
-        city = request.form['city']
-        state = request.form['state']
-        zip = request.form['zip']
         phone_num = request.form['phone_num']
-        v_status = request.form['v_status']
-        p_status = request.form['p_status']
 
-        with mysql.cursor() as cur:
-            cur.execute("""
-                UPDATE Criminals
-                SET l_name = %s, f_name = %s, street = %s, city = %s, state = %s, zip = %s, phone_num = %s, V_status = %s, P_status = %s
-                WHERE criminal_ID = %s
-            """, (l_name, f_name, street, city, state, zip, phone_num, v_status, p_status, criminal_ID))
-            mysql.commit()
+        if data_type == 'criminal':
+            street = request.form['street']
+            city = request.form['city']
+            state = request.form['state']
+            zip = request.form['zip']
+            v_status = request.form['v_status']
+            p_status = request.form['p_status']
+            with mysql.cursor() as cur:
+                cur.execute("""
+                    UPDATE Criminals
+                    SET l_name = %s, f_name = %s, street = %s, city = %s, state = %s, zip = %s, phone_num = %s, V_status = %s, P_status = %s
+                    WHERE criminal_ID = %s
+                """, (l_name, f_name, street, city, state, zip, phone_num, v_status, p_status, id))
+        elif data_type == 'officer':
+            precinct = request.form['precinct']
+            badge = request.form['badge']
+            status = request.form['status']
+            with mysql.cursor() as cur:
+                cur.execute("""
+                    UPDATE Officers
+                    SET last = %s, first = %s, precinct = %s, badge = %s, phone = %s, status = %s
+                    WHERE officer_ID = %s
+                """, (l_name, f_name, precinct, badge, phone_num, status, id))
+        else:
+            flash(f'Invalid data type: {data_type}', 'danger')
+            return redirect(url_for('index'))
 
-        flash('Criminal information updated successfully!', 'success')
-        return redirect(url_for('display',  data_type='criminals'))
+        mysql.commit()
+
+        flash(f'{data_type[:-1].capitalize()} information updated successfully!', 'success')
+        return redirect(url_for('display', data_type=data_type))
 
     with mysql.cursor() as cur:
-        cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (criminal_ID,))
-        criminal = cur.fetchone()
+        if data_type == 'criminal':
+            cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (id,))
+        elif data_type == 'officer':
+            cur.execute("SELECT * FROM Officers WHERE officer_ID = %s", (id,))
+        else:
+            flash(f'Invalid data type: {data_type}', 'danger')
+            return redirect(url_for('index'))
 
-    if criminal is None:
-        flash('Criminal not found', 'error')
-    return render_template('update_criminal.html', criminal=criminal)
+        entry = cur.fetchone()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return render_template('update_entry.html', data_type=data_type, id=id, entry=entry)
 
 
 

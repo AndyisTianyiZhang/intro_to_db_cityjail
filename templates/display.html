@@ -7,119 +7,128 @@
 {% block content %}
 
 <div class="container">
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="flashes">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
   <form method="post" action="{{ url_for('display', data_type=data_type) }}">
-    <label for="search_id">Enter ID:</label>
-    <input type="number" id="search_id" name="search_id" required>
-    <input type="hidden" name="action" value="search">
-    <input type="submit" value="Search">
-  </form>
-  {% if data_type == 'criminal' %}
-    <h2>All Criminals</h2>
-    {% if current_user.role == 'admin' %}
-          <p><a href="{{ url_for('add_entry', data_type = 'criminal') }}">Add a New Criminal</a></p>
+      <label for="search_id">Enter ID:</label>
+      <input type="number" id="search_id" name="search_id" required>
+      <input type="hidden" name="action" value="search">
+      <input type="submit" value="Search">
+    </form>
+  <div class="table-container">
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% if data_type == 'criminal' %}
+      <h2>All Criminals</h2>
+      {% if current_user.role == 'admin' %}
+            <p><a href="{{ url_for('add_entry', data_type = 'criminal') }}">Add a New Criminal</a></p>
+      {% endif %}
+      <table>
+        <!-- Table headers for criminals -->
+        <tr>
+          <th>ID</th>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Street</th>
+          <th>City</th>
+          <th>State</th>
+          <th>Zip</th>
+          <th>Phone</th>
+          <th>Violent Status</th>
+          <th>Property Status</th>
+          {% if current_user.role == 'admin' %}
+            <th>Action</th>
+          {% endif %}
+        </tr>
+        <thead>
+          <!-- Add table headers for criminals here -->
+        </thead>
+        <tbody>
+          {% for criminal in data['criminals'] %}
+            <tr>
+              <!-- Add table data for criminals here -->
+              <td>{{ criminal[0] }}</td>
+              <td>{{ criminal[1] }}</td>
+              <td>{{ criminal[2] }}</td>
+              <td>{{ criminal[3] }}</td>
+              <td>{{ criminal[4] }}</td>
+              <td>{{ criminal[5] }}</td>
+              <td>{{ criminal[6] }}</td>
+              <td>{{ criminal[7] }}</td>
+              <td>{{ criminal[8] }}</td>
+              <td>{{ criminal[9] }}</td>
+              {% if current_user.role == 'admin' %}
+                <td>
+                  <a href="{{ url_for('update_entry', data_type = 'criminal', id=criminal[0]) }}" class="btn btn-warning">Update</a>
+                </td>
+                <td>
+                  <a href="{{ url_for('delete_entry', data_type = 'criminal', id=criminal[0]) }}" class="btn btn-warning">Delete</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% elif data_type == 'officer' %}
+      <h2>All Officers</h2>
+      {% if current_user.role == 'admin' %}
+            <p><a href="{{ url_for('add_entry', data_type = 'officer') }}">Add a New Criminal</a></p>
+      {% endif %}
+      <table>
+        <!-- Table headers for officers and probation officers -->
+        <!-- Table headers for criminals -->
+        <tr>
+          <th>ID</th>
+          <th>Last Name</th>
+          <th>First Name</th>
+          <th>Precinct</th>
+          <th>Badge Number</th>
+          <th>Phone number</th>
+          <th>Status</th>
+          {% if current_user.role == 'admin' %}
+            <th>Action</th>
+          {% endif %}
+        </tr>
+        <thead>
+          <!-- Add table headers for officers and probation officers here -->
+        </thead>
+        <tbody>
+          {% for officer in data['officers'] %}
+            <tr>
+              <!-- Add table data for officers here -->
+              <td>{{ officer[0] }}</td>
+              <td>{{ officer[1] }}</td>
+              <td>{{ officer[2] }}</td>
+              <td>{{ officer[3] }}</td>
+              <td>{{ officer[4] }}</td>
+              <td>{{ officer[5] }}</td>
+              <td>{{ officer[6] }}</td>
+              <td>{{ officer[7] }}</td>
+              {% if current_user.role == 'admin' %}
+                <td>
+                  <a href="{{ url_for('update_entry', data_type = 'officer', id=officer[0]) }}" class="btn btn-warning">Update</a>
+                </td>
+                <td>
+                  <a href="{{ url_for('delete_entry', data_type = officer, id=officer[0]) }}" class="btn btn-warning">Delete</a>
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+          {% for prob_officer in data['prob_officers'] %}
+            <tr>
+              <!-- Add table data for probation officers here -->
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     {% endif %}
-    <table>
-      <!-- Table headers for criminals -->
-      <tr>
-        <th>ID</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Street</th>
-        <th>City</th>
-        <th>State</th>
-        <th>Zip</th>
-        <th>Phone</th>
-        <th>Violent Status</th>
-        <th>Property Status</th>
-        {% if current_user.role == 'admin' %}
-          <th>Action</th>
-        {% endif %}
-      </tr>
-      <thead>
-        <!-- Add table headers for criminals here -->
-      </thead>
-      <tbody>
-        {% for criminal in data['criminals'] %}
-          <tr>
-            <!-- Add table data for criminals here -->
-            <td>{{ criminal[0] }}</td>
-            <td>{{ criminal[1] }}</td>
-            <td>{{ criminal[2] }}</td>
-            <td>{{ criminal[3] }}</td>
-            <td>{{ criminal[4] }}</td>
-            <td>{{ criminal[5] }}</td>
-            <td>{{ criminal[6] }}</td>
-            <td>{{ criminal[7] }}</td>
-            <td>{{ criminal[8] }}</td>
-            <td>{{ criminal[9] }}</td>
-            {% if current_user.role == 'admin' %}
-              <td>
-                <a href="{{ url_for('update_criminal', criminal_ID=criminal[0]) }}" class="btn btn-warning">Update</a>
-              </td>
-            {% endif %}
-            {% if current_user.role == 'admin' %}
-              <td>
-                <a href="{{ url_for('delete_criminal', criminal_ID=criminal[0]) }}" class="btn btn-warning">Delete</a>
-              </td>
-            {% endif %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% elif data_type == 'officer' %}
-    <h2>All Officers and Probation Officers</h2>
-    {% if current_user.role == 'admin' %}
-          <p><a href="{{ url_for('add_entry', data_type = 'officer') }}">Add a New Criminal</a></p>
-    {% endif %}
-    <table>
-      <!-- Table headers for officers and probation officers -->
-      <!-- Table headers for criminals -->
-      <tr>
-        <th>ID</th>
-        <th>Last Name</th>
-        <th>First Name</th>
-        <th>Precinct</th>
-        <th>Badge Number</th>
-        <th>Phone number</th>
-        <th>Status</th>
-        {% if current_user.role == 'admin' %}
-          <th>Action</th>
-        {% endif %}
-      </tr>
-      <thead>
-        <!-- Add table headers for officers and probation officers here -->
-      </thead>
-      <tbody>
-        {% for officer in data['officers'] %}
-          <tr>
-            <!-- Add table data for officers here -->
-            <td>{{ officer[0] }}</td>
-            <td>{{ officer[1] }}</td>
-            <td>{{ officer[2] }}</td>
-            <td>{{ officer[3] }}</td>
-            <td>{{ officer[4] }}</td>
-            <td>{{ officer[5] }}</td>
-            <td>{{ officer[6] }}</td>
-            <td>{{ officer[7] }}</td>
-          </tr>
-        {% endfor %}
-        {% for prob_officer in data['prob_officers'] %}
-          <tr>
-            <!-- Add table data for probation officers here -->
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
+    </div>
 </div>
 {% endblock %}
 
