@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Update Criminal - ZzzCrimeCheck
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+      <h2>Update Criminal</h2>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      <form method="post" action="{{ url_for('update_criminal', criminal_ID=criminal[0]) }}">
+          <label for="l_name">Last Name:</label>
+          <input type="text" id="l_name" name="l_name" value="{{ criminal[2] }}" required>
+
+          <label for="f_name">First Name:</label>
+          <input type="text" id="f_name" name="f_name" value="{{ criminal[1] }}" required>
+
+          <label for="street">Street:</label>
+          <input type="text" id="street" name="street" value="{{ criminal[3] }}" required>
+
+          <label for="city">City:</label>
+          <input type="text" id="city" name="city" value="{{ criminal[4] }}" required>
+
+          <label for="state">State:</label>
+          <input type="text" id="state" name="state" value="{{ criminal[5] }}" required>
+
+          <label for="zip">Zip:</label>
+          <input type="text" id="zip" name="zip" value="{{ criminal[6] }}" required>
+
+          <label for="phone_num">Phone Number:</label>
+          <input type="text" id="phone_num" name="phone_num" value="{{ criminal[7] }}" required>
+
+          <label for="v_status" class="radio-label">V Status:</label>
+          <div class="radio-options">
+            <input type="radio" id="v_status_yes" name="v_status" value="Y" {% if criminal[8] == 'Y' %}checked{% endif %}>
+            <label for="v_status_yes">Yes</label>
+            <input type="radio" id="v_status_no" name="v_status" value="N" {% if criminal[8] == 'N' %}checked{% endif %}>
+            <label for="v_status_no">No</label>
+          </div>
+
+          <label for="p_status" class="radio-label">P Status:</label>
+          <div class="radio-options">
+            <input type="radio" id="p_status_yes" name="p_status" value="Y" {% if criminal[9] == 'Y' %}checked{% endif %}>
+            <label for="p_status_yes">Yes</label>
+            <input type="radio" id="p_status_no" name="p_status" value="N" {% if criminal[9] == 'N' %}checked{% endif %}>
+            <label for="p_status_no">No</label>
+          </div>
+
+          <input type="submit" value="Update Criminal">
+      </form>
+  </div>
+  {% endblock %}

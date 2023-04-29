@@ -178,6 +178,7 @@ def get_all_criminals():
 
 @app.route('/add_criminal', methods=['GET', 'POST'])
 @login_required
+@admin_required
 def add_criminal():
     if request.method == 'POST':
         # Retrieve form data
@@ -210,6 +211,18 @@ def delete_criminal():
         criminal_id = request.form['criminal_id']
 
         with mysql.cursor() as cur:
+            cur.execute('DELETE FROM Aliases WHERE criminal_ID = %s', (criminal_id,))
+            cur.execute('DELETE FROM Sentences WHERE criminal_ID = %s', (criminal_id,))
+            
+            cur.execute('SELECT crime_id FROM Crimes WHERE criminal_ID = %s', (criminal_id,))
+            crime_ids = [row[0] for row in cur.fetchall()]
+            
+            if crime_ids:
+                cur.execute('DELETE FROM Appeals WHERE crime_id IN %s', (tuple(crime_ids),))
+                cur.execute('DELETE FROM CriminalCharges WHERE crime_id IN %s', (tuple(crime_ids),))
+                cur.execute('DELETE FROM Crime_Officers WHERE crime_id IN %s', (tuple(crime_ids),))
+                cur.execute('DELETE FROM Crimes WHERE criminal_ID = %s', (criminal_id,))
+            
             cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (criminal_id,))
             mysql.commit()
 
@@ -219,8 +232,44 @@ def delete_criminal():
         cur.execute("SELECT * FROM Criminals;")
         result = cur.fetchall()
 
-    return render_template('delete_criminal.html', criminals = result)
+    return render_template('delete_criminal.html', criminals=result)
 
+
+@app.route('/update_criminal/<int:criminal_ID>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_criminal(criminal_ID):
+    if request.method == 'POST':
+        l_name = request.form['l_name']
+        f_name = request.form['f_name']
+        street = request.form['street']
+        city = request.form['city']
+        state = request.form['state']
+        zip = request.form['zip']
+        phone_num = request.form['phone_num']
+        v_status = request.form['v_status']
+        p_status = request.form['p_status']
+
+        with mysql.cursor() as cur:
+            cur.execute("""
+                UPDATE Criminals
+                SET l_name = %s, f_name = %s, street = %s, city = %s, state = %s, zip = %s, phone_num = %s, V_status = %s, P_status = %s
+                WHERE criminal_ID = %s
+            """, (l_name, f_name, street, city, state, zip, phone_num, v_status, p_status, criminal_ID))
+            mysql.commit()
+
+        flash('Criminal information updated successfully!', 'success')
+        return redirect(url_for('get_all_criminals'))
+
+    with mysql.cursor() as cur:
+        cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (criminal_ID,))
+        criminal = cur.fetchone()
+
+    if criminal is None:
+        flash('Criminal not found', 'error')
+        return redirect(url_for('get_all_criminals'))
+
+    return render_template('update_criminal.html', criminal=criminal)
 
 
 
@@ -228,13 +277,6 @@ def delete_criminal():
 @app.route('/about')
 def about():
     return render_template('Zzz_about.html')
-
-# # Logout page
-# @app.route('/logout')
-# @login_required
-# def logout():
-#     logout_user()
-#     return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port = 8000)

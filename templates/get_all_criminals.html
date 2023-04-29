@@ -22,6 +22,9 @@
               <th>Phone</th>
               <th>Violent Status</th>
               <th>Property Status</th>
+              {% if current_user.role == 'admin' %}
+                <th>Action</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
@@ -37,6 +40,11 @@
                 <td>{{ criminal[7] }}</td>
                 <td>{{ criminal[8] }}</td>
                 <td>{{ criminal[9] }}</td>
+                {% if current_user.role == 'admin' %}
+                  <td>
+                    <a href="{{ url_for('update_criminal', criminal_ID=criminal[0]) }}" class="btn btn-warning">Update</a>
+                  </td>
+                {% endif %}
               </tr>
             {% endfor %}
           </tbody>
@@ -44,4 +52,3 @@
       </div>
     </div>
 {% endblock %}
-
