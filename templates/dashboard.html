@@ -56,7 +56,11 @@
         {% endif %}
         {% if current_user.role == 'admin' %}
           <a href="{{ url_for('display', data_type='criminal_charges') }}" class="dashboard-item">
-          <h3>Manage Appeal</h3>
+          <h3>Manage Charges</h3>
+        {% endif %}
+        {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('display', data_type='aliases') }}" class="dashboard-item">
+          <h3>Manage Alias</h3>
         {% endif %}
         </a>
       </div>

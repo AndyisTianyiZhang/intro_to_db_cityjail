@@ -198,6 +198,9 @@ def display(data_type):
             elif data_type == 'criminal_charges':
                 cur.execute("SELECT * FROM CriminalCharges WHERE charge_id = %s", (search_id,))
                 data['criminal_charges'] = cur.fetchall()
+            elif data_type == 'aliases':
+                cur.execute("SELECT * FROM Aliases WHERE alias_id = %s", (search_id,))
+                data['aliases'] = cur.fetchall()
         else:
             if data_type == 'criminal':
                 cur.execute("SELECT * FROM Criminals")
@@ -223,6 +226,9 @@ def display(data_type):
             elif data_type == 'criminal_charges':
                 cur.execute("SELECT * FROM CriminalCharges")
                 data['criminal_charges'] = cur.fetchall()
+            elif data_type == 'aliases':
+                cur.execute("SELECT * FROM Aliases")
+                data['aliases'] = cur.fetchall()
 
     return render_template('display.html', data=data, data_type=data_type, search_id=search_id)
 
@@ -291,6 +297,11 @@ def add_entry(data_type):
             court_fee = request.form['court_fee']
             amount_paid = request.form['amount_paid']
             pay_due_date = request.form['pay_due_date']
+        elif data_type == 'aliases':
+            alias_id = request.form['alias_id']
+            criminal_id = request.form['criminal_id']
+            alias = request.form['alias']
+
 
 
         # Insert new entry into database
@@ -311,6 +322,8 @@ def add_entry(data_type):
                 cur.execute('INSERT INTO Appeals (appeal_id, crime_id, filing_date, hearing_date, status) VALUES (%s, %s, %s, %s, %s)', (appeal_id, crime_id, filing_date, hearing_date, status))
             elif data_type == 'criminal_charges':
                 cur.execute('INSERT INTO CriminalCharges (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date))
+            elif data_type == 'aliases':
+                cur.execute('INSERT INTO Aliases (alias_id, criminal_id, alias) VALUES (%s, %s, %s)', (alias_id, criminal_id, alias))
             else:
                 flash('Invalid data type specified.', 'error')
                 return redirect(url_for('index'))
@@ -372,6 +385,9 @@ def delete_entry(data_type, id, id2=None):
     elif data_type == "criminal_charges":
         with mysql.cursor() as cur:
             cur.execute('DELETE FROM CriminalCharges WHERE charge_id = %s', (id,))
+    elif data_type == "aliases":
+        with mysql.cursor() as cur:
+            cur.execute('DELETE FROM Aliases WHERE alias_id = %s', (id,))
 
     mysql.commit()
 
@@ -482,7 +498,13 @@ def update_entry(data_type, id, id2=None):
 
             with mysql.cursor() as cur:
                 cur.execute('UPDATE CriminalCharges SET charge_id = %s, crime_id = %s, crime_code = %s, charge_status = %s, fine_amount = %s, court_fee = %s, amount_paid = %s, pay_due_date = %s WHERE charge_id = %s', (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date, id))
+        elif data_type == 'aliases':
+            alias_id = request.form['alias_id']
+            criminal_id = request.form['criminal_id']
+            alias = request.form['alias']
 
+            with mysql.cursor() as cur:
+                cur.execute('UPDATE Aliases SET alias_id = %s, criminal_id = %s, alias = %s WHERE alias_id = %s', (alias_id, criminal_id, alias, id))
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))
@@ -509,6 +531,8 @@ def update_entry(data_type, id, id2=None):
             cur.execute("SELECT * FROM Appeals WHERE appeal_id = %s", (id,))
         elif data_type == 'criminal_charges':
             cur.execute('SELECT * FROM CriminalCharges WHERE charge_id = %s', (id,))
+        elif data_type == 'aliases':
+            cur.execute('SELECT * FROM Aliases WHERE alias_id = %s', (id,))
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))

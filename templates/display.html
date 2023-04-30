@@ -332,8 +332,33 @@
                         {% endif %}
                       </tr>
                     {% endfor %}
-                
-
+                    {% elif data_type == 'aliases' %}
+                    <h2>Aliases</h2>
+                    {% if current_user.role == 'admin' %}
+                      <p><a href="{{ url_for('add_entry', data_type='aliases') }}">Add a New Aliases</a></p>
+                    {% endif %}
+                    <table>
+                      <tr>
+                          <th>Alias ID</th>
+                          <th>Criminal ID</th>
+                          <th>Alias</th>
+                          {% if current_user.is_admin %}
+                            <th>Action</th>
+                          {% endif %}
+                      </tr>
+                      {% for alias in data['aliases'] %}
+                      <tr>
+                          <td>{{ alias[0] }}</td>
+                          <td>{{ alias[1] }}</td>
+                          <td>{{ alias[2] }}</td>
+                          {% if current_user.is_admin %}
+                          <td>
+                              <a href="{{ url_for('update_entry', data_type=data_type, id=alias[0]) }}" class="btn btn-primary">Update</a>
+                              <a href="{{ url_for('delete_entry', data_type=data_type, id=alias[0]) }}" class="btn btn-danger">Delete</a>
+                          </td>
+                          {% endif %}
+                      </tr>
+                    {% endfor %}
 
 
           </table>

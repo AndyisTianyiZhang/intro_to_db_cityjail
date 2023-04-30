@@ -216,11 +216,17 @@
               <label for="pay_due_date">Pay Due Date:</label>
               <input type="date" id="pay_due_date" name="pay_due_date" required>
           {% endif %}
+          {% if data_type == 'aliases' %}
+              <label for="alias_id">Alias ID:</label>
+              <input type="text" id="alias_id" name="alias_id" required>
 
+              <label for="criminal_id">Criminal ID:</label>
+              <input type="text" id="criminal_id" name="criminal_id" required>
 
+              <label for="alias">Alias:</label>
+              <input type="text" id="alias" name="alias" required>
+          {% endif %}
 
-
-          
           <input type="submit" value="Add {{ data_type.capitalize() }}">
       </form>
   </div>
