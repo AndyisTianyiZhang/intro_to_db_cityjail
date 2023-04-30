@@ -5,7 +5,11 @@
 {% endblock %}
 {% block content %}
     <div class="dash-container">
+      {% if current_user.role == 'admin' %}
       <h2>Admin Dashboard</h2>
+      {% else %}
+      <h2>Dashboard</h2>
+      {% endif %}
       <div class="dashboard-menu">
         
         {% if current_user.role == 'admin' %}
@@ -45,6 +49,10 @@
         {% if current_user.role == 'admin' %}
           <a href="{{ url_for('display', data_type='crime') }}" class="dashboard-item">
           <h3>Manage Crime</h3>
+        {% endif %}
+        {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('display', data_type='appeal') }}" class="dashboard-item">
+          <h3>Manage Appeal</h3>
         {% endif %}
         </a>
       </div>

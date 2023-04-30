@@ -167,6 +167,27 @@
           <input type="date" id="appeal_cutoff_date" name="appeal_cutoff_date" required>
           {% endif %}
 
+          {% if data_type == 'appeal' %}
+          <label for="appeal_id">Appeal ID:</label>
+          <input type="text" id="appeal_id" name="appeal_id" required>
+
+          <label for="crime_id">Crime ID:</label>
+          <input type="text" id="crime_id" name="crime_id" required>
+
+          <label for="filing_date">Filing Date:</label>
+          <input type="date" id="filing_date" name="filing_date" required>
+
+          <label for="hearing_date">Hearing Date:</label>
+          <input type="date" id="hearing_date" name="hearing_date" required>
+
+          <label for="status">Status:</label>
+          <select id="status" name="status" required>
+              <option value="P">P</option>
+              <option value="A">A</option>
+              <option value="D">D</option>
+          </select>
+          {% endif %}
+
 
           
           <input type="submit" value="Add {{ data_type.capitalize() }}">

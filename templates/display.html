@@ -258,6 +258,40 @@
                     {% endif %}
                   </tr>
                 {% endfor %}
+                {% elif data_type == 'appeal' %}
+                <h2>All Appeals</h2>
+                {% if current_user.role == 'admin' %}
+                  <p><a href="{{ url_for('add_entry', data_type='appeal') }}">Add a New Appeal</a></p>
+                {% endif %}
+                <table>
+                  <tr>
+                    <th>Appeal ID</th>
+                    <th>Crime ID</th>
+                    <th>Filing Date</th>
+                    <th>Hearing Date</th>
+                    <th>Status</th>
+                    {% if current_user.role == 'admin' %}
+                      <th>Action</th>
+                    {% endif %}
+                  </tr>
+                  <tbody>
+                  {% for appeal in data['appeals'] %}
+                    <tr>
+                      <td>{{ appeal[0] }}</td>
+                      <td>{{ appeal[1] }}</td>
+                      <td>{{ appeal[2] }}</td>
+                      <td>{{ appeal[3] }}</td>
+                      <td>{{ appeal[4] }}</td>
+                      {% if current_user.role == 'admin' %}
+                        <td>
+                          <a href="{{ url_for('update_entry', data_type='appeal', id=appeal[0]) }}" class="btn btn-warning">Update</a>
+                        </td>
+                        <td>
+                          <a href="{{ url_for('delete_entry', data_type='appeal', id=appeal[0]) }}" class="btn btn-warning">Delete</a>
+                        </td>
+                      {% endif %}
+                    </tr>
+                  {% endfor %}
           </table>
         </tbody>
       </table>
