@@ -155,10 +155,7 @@
           <input type="date" id="appeal_cutoff_date" name="appeal_cutoff_date" value="{{ entry[6] }}">
     
           {% endif %}
-          {% if data_type == 'appeal' %}
-          <label for="appeal_id">Appeal ID:</label>
-          <input type="text" id="appeal_id" name="appeal_id" value="{{ entry[0] }}" readonly>
-        
+          {% if data_type == 'appeal' %}       
           <label for="crime_id">Crime ID:</label>
           <input type="text" id="crime_id" name="crime_id" value="{{ entry[1] }}" required>
         
@@ -175,10 +172,7 @@
             <option value="D" {% if entry[4] == 'D' %}selected{% endif %}>D</option>
           </select>
           {% endif %}
-          {% if data_type == 'criminal_charges' %}
-          <label for="charge_id">Charge ID:</label>
-          <input type="text" id="charge_id" name="charge_id" value="{{ entry[0] }}" required>
-        
+          {% if data_type == 'criminal_charges' %}      
           <label for="crime_id">Crime ID:</label>
           <input type="text" id="crime_id" name="crime_id" value="{{ entry[1] }}" required>
         
@@ -206,9 +200,6 @@
           {% endif %}
 
           {% if data_type == 'aliases' %}
-          <label for="alias_id">Alias ID:</label>
-          <input type="text" id="alias_id" name="alias_id" value="{{ entry[0] }}" required>
-
           <label for="criminal_id">Criminal ID:</label>
           <input type="text" id="criminal_id" name="criminal_id" value="{{ entry[1] }}" required>
 
@@ -216,9 +207,6 @@
           <input type="text" id="alias" name="alias" value="{{ entry[2] }}" required>
           {% endif %}
           {% if data_type == 'sentences' %}
-          <label for="sentence_id">Sentence ID:</label>
-          <input type="text" id="sentence_id" name="sentence_id" value="{{ entry[0] }}" required>
-
           <label for="start_date">Start Date:</label>
           <input type="date" id="start_date" name="start_date" value="{{ entry[1] }}" required>
 

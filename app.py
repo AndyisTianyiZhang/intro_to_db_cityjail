@@ -507,8 +507,9 @@ def update_entry(data_type, id, id2=None):
                     SET crime_id = %s, filing_date = %s, hearing_date = %s, status = %s
                     WHERE appeal_id = %s
                 """, (crime_id, filing_date, hearing_date, status, id))
+
+
         elif data_type == 'criminal_charges':
-            charge_id = request.form['charge_id']
             crime_id = request.form['crime_id']
             crime_code = request.form['crime_code']
             charge_status = request.form['charge_status']
@@ -518,16 +519,14 @@ def update_entry(data_type, id, id2=None):
             pay_due_date = request.form['pay_due_date']
 
             with mysql.cursor() as cur:
-                cur.execute('UPDATE CriminalCharges SET charge_id = %s, crime_id = %s, crime_code = %s, charge_status = %s, fine_amount = %s, court_fee = %s, amount_paid = %s, pay_due_date = %s WHERE charge_id = %s', (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date, id))
+                cur.execute('UPDATE CriminalCharges SET crime_id = %s, crime_code = %s, charge_status = %s, fine_amount = %s, court_fee = %s, amount_paid = %s, pay_due_date = %s WHERE charge_id = %s', (crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date, id))
         elif data_type == 'aliases':
-            alias_id = request.form['alias_id']
             criminal_id = request.form['criminal_id']
             alias = request.form['alias']
 
             with mysql.cursor() as cur:
-                cur.execute('UPDATE Aliases SET alias_id = %s, criminal_id = %s, alias = %s WHERE alias_id = %s', (alias_id, criminal_id, alias, id))
+                cur.execute('UPDATE Aliases SET criminal_id = %s, alias = %s WHERE alias_id = %s', (criminal_id, alias, id))
         elif data_type == 'sentences':
-            sentence_id = request.form['sentence_id']
             start_date = request.form['start_date']
             end_date = request.form['end_date']
             num_violations = request.form['num_violations']
@@ -536,7 +535,7 @@ def update_entry(data_type, id, id2=None):
             prob_id = request.form['prob_id']
 
             with mysql.cursor() as cur:
-                cur.execute('UPDATE Sentences SET sentence_id = %s, start_date = %s, end_date = %s, num_violations = %s, type_of_sentence = %s, criminal_id = %s, prob_id = %s WHERE sentence_id = %s', (sentence_id, start_date, end_date, num_violations, type_of_sentence, criminal_id, prob_id, id))
+                cur.execute('UPDATE Sentences SET start_date = %s, end_date = %s, num_violations = %s, type_of_sentence = %s, criminal_id = %s, prob_id = %s WHERE sentence_id = %s', (start_date, end_date, num_violations, type_of_sentence, criminal_id, prob_id, id))
 
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
