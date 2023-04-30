@@ -195,6 +195,9 @@ def display(data_type):
             elif data_type == 'appeal':
                 cur.execute("SELECT * FROM Appeals WHERE appeal_id = %s", (search_id,))
                 data['appeals'] = cur.fetchall()
+            elif data_type == 'criminal_charges':
+                cur.execute("SELECT * FROM CriminalCharges WHERE charge_id = %s", (search_id,))
+                data['criminal_charges'] = cur.fetchall()
         else:
             if data_type == 'criminal':
                 cur.execute("SELECT * FROM Criminals")
@@ -217,6 +220,9 @@ def display(data_type):
             elif data_type == 'appeal':
                 cur.execute("SELECT * FROM Appeals")
                 data['appeals'] = cur.fetchall()
+            elif data_type == 'criminal_charges':
+                cur.execute("SELECT * FROM CriminalCharges")
+                data['criminal_charges'] = cur.fetchall()
 
     return render_template('display.html', data=data, data_type=data_type, search_id=search_id)
 
@@ -276,6 +282,16 @@ def add_entry(data_type):
             filing_date = request.form['filing_date']
             hearing_date = request.form['hearing_date']
             status = request.form['status']
+        elif data_type == 'criminal_charges':
+            charge_id = request.form['charge_id']
+            crime_id = request.form['crime_id']
+            crime_code = request.form['crime_code']
+            charge_status = request.form['charge_status']
+            fine_amount = request.form['fine_amount']
+            court_fee = request.form['court_fee']
+            amount_paid = request.form['amount_paid']
+            pay_due_date = request.form['pay_due_date']
+
 
         # Insert new entry into database
         with mysql.cursor() as cur:
@@ -293,6 +309,8 @@ def add_entry(data_type):
                 cur.execute('INSERT INTO Crimes (crime_id, criminal_id, classification, date_charged, status, hearing_date, appeal_cutoff_date) VALUES (%s, %s, %s, %s, %s, %s, %s)', (crime_id, criminal_id, classification, date_charged, status, hearing_date, appeal_cutoff_date))
             elif data_type == 'appeal':
                 cur.execute('INSERT INTO Appeals (appeal_id, crime_id, filing_date, hearing_date, status) VALUES (%s, %s, %s, %s, %s)', (appeal_id, crime_id, filing_date, hearing_date, status))
+            elif data_type == 'criminal_charges':
+                cur.execute('INSERT INTO CriminalCharges (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date))
             else:
                 flash('Invalid data type specified.', 'error')
                 return redirect(url_for('index'))
@@ -351,9 +369,9 @@ def delete_entry(data_type, id, id2=None):
     elif data_type == "appeal":
         with mysql.cursor() as cur:
             cur.execute('DELETE FROM Appeals WHERE appeal_id = %s', (id,))
-            mysql.commit()
-            flash(f'{data_type} deleted successfully!', 'success')
-            return redirect(url_for('display', data_type=data_type))
+    elif data_type == "criminal_charges":
+        with mysql.cursor() as cur:
+            cur.execute('DELETE FROM CriminalCharges WHERE charge_id = %s', (id,))
 
     mysql.commit()
 
@@ -452,6 +470,19 @@ def update_entry(data_type, id, id2=None):
                     SET crime_id = %s, filing_date = %s, hearing_date = %s, status = %s
                     WHERE appeal_id = %s
                 """, (crime_id, filing_date, hearing_date, status, id))
+        elif data_type == 'criminal_charges':
+            charge_id = request.form['charge_id']
+            crime_id = request.form['crime_id']
+            crime_code = request.form['crime_code']
+            charge_status = request.form['charge_status']
+            fine_amount = request.form['fine_amount']
+            court_fee = request.form['court_fee']
+            amount_paid = request.form['amount_paid']
+            pay_due_date = request.form['pay_due_date']
+
+            with mysql.cursor() as cur:
+                cur.execute('UPDATE CriminalCharges SET charge_id = %s, crime_id = %s, crime_code = %s, charge_status = %s, fine_amount = %s, court_fee = %s, amount_paid = %s, pay_due_date = %s WHERE charge_id = %s', (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date, id))
+
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))
@@ -476,6 +507,8 @@ def update_entry(data_type, id, id2=None):
             cur.execute("SELECT * FROM Crimes WHERE crime_id = %s", (id,))
         elif data_type == 'appeal':
             cur.execute("SELECT * FROM Appeals WHERE appeal_id = %s", (id,))
+        elif data_type == 'criminal_charges':
+            cur.execute('SELECT * FROM CriminalCharges WHERE charge_id = %s', (id,))
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))

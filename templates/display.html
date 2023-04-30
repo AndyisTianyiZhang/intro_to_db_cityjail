@@ -292,6 +292,50 @@
                       {% endif %}
                     </tr>
                   {% endfor %}
+                  {% elif data_type == 'criminal_charges' %}
+                  <h2>All Criminal Charges</h2>
+                  {% if current_user.role == 'admin' %}
+                    <p><a href="{{ url_for('add_entry', data_type='criminal_charges') }}">Add a New Criminal Charge</a></p>
+                  {% endif %}
+                  <table>
+                    <tr>
+                      <th>Charge ID</th>
+                      <th>Crime ID</th>
+                      <th>Crime Code</th>
+                      <th>Charge Status</th>
+                      <th>Fine Amount</th>
+                      <th>Court Fee</th>
+                      <th>Amount Paid</th>
+                      <th>Pay Due Date</th>
+                      {% if current_user.role == 'admin' %}
+                        <th>Action</th>
+                      {% endif %}
+                    </tr>
+                    <tbody>
+                    {% for charge in data['criminal_charges'] %}
+                      <tr>
+                        <td>{{ charge[0] }}</td>
+                        <td>{{ charge[1] }}</td>
+                        <td>{{ charge[2] }}</td>
+                        <td>{{ charge[3] }}</td>
+                        <td>{{ charge[4] }}</td>
+                        <td>{{ charge[5] }}</td>
+                        <td>{{ charge[6] }}</td>
+                        <td>{{ charge[7] }}</td>
+                        {% if current_user.role == 'admin' %}
+                          <td>
+                            <a href="{{ url_for('update_entry', data_type='criminal_charges', id=charge[0]) }}" class="btn btn-warning">Update</a>
+                          </td>
+                          <td>
+                            <a href="{{ url_for('delete_entry', data_type='criminal_charges', id=charge[0]) }}" class="btn btn-warning">Delete</a>
+                          </td>
+                        {% endif %}
+                      </tr>
+                    {% endfor %}
+                
+
+
+
           </table>
         </tbody>
       </table>
