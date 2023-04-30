@@ -215,11 +215,34 @@
           <label for="alias">Alias:</label>
           <input type="text" id="alias" name="alias" value="{{ entry[2] }}" required>
           {% endif %}
+          {% if data_type == 'sentences' %}
+          <label for="sentence_id">Sentence ID:</label>
+          <input type="text" id="sentence_id" name="sentence_id" value="{{ entry[0] }}" required>
 
-      
-        
+          <label for="start_date">Start Date:</label>
+          <input type="date" id="start_date" name="start_date" value="{{ entry[1] }}" required>
 
-          
+          <label for="end_date">End Date:</label>
+          <input type="date" id="end_date" name="end_date" value="{{ entry[2] }}" required>
+
+          <label for="num_violations">Number of Violations:</label>
+          <input type="number" id="num_violations" name="num_violations" value="{{ entry[3] }}" required>
+
+          <label for="type_of_sentence">Type of Sentence:</label>
+          <select id="type_of_sentence" name="type_of_sentence" required>
+              <option value="J" {% if entry[4] == 'J' %}selected{% endif %}>J</option>
+              <option value="H" {% if entry[4] == 'H' %}selected{% endif %}>H</option>
+              <option value="P" {% if entry[4] == 'P' %}selected{% endif %}>P</option>
+          </select>
+
+          <label for="criminal_id">Criminal ID:</label>
+          <input type="text" id="criminal_id" name="criminal_id" value="{{ entry[5] }}" required>
+
+          <label for="prob_id">Probation Officer ID:</label>
+          <input type="text" id="prob_id" name="prob_id" value="{{ entry[6] }}" required>
+      {% endif %}
+
+
           <input type="submit" value="Update {{ data_type[:-1].capitalize() }}">
       </form>
     </div>

@@ -359,8 +359,42 @@
                           {% endif %}
                       </tr>
                     {% endfor %}
-
-
+                    {% elif data_type == 'sentences' %}
+                    <h2>Sentences</h2>
+                    {% if current_user.role == 'admin' %}
+                        <p><a href="{{ url_for('add_entry', data_type='sentences') }}">Add a New Sentence</a></p>
+                    {% endif %}
+                    <table>
+                        <tr>
+                            <th>Sentence ID</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Num Violations</th>
+                            <th>Type of Sentence</th>
+                            <th>Criminal ID</th>
+                            <th>Probation Officer ID</th>
+                            {% if current_user.is_admin %}
+                                <th>Action</th>
+                            {% endif %}
+                        </tr>
+                        {% for sentence in data['sentences'] %}
+                            <tr>
+                                <td>{{ sentence[0] }}</td>
+                                <td>{{ sentence[1] }}</td>
+                                <td>{{ sentence[2] }}</td>
+                                <td>{{ sentence[3] }}</td>
+                                <td>{{ sentence[4] }}</td>
+                                <td>{{ sentence[5] }}</td>
+                                <td>{{ sentence[6] }}</td>
+                                {% if current_user.is_admin %}
+                                <td>
+                                    <a href="{{ url_for('update_entry', data_type=data_type, id=sentence[0]) }}" class="btn btn-primary">Update</a>
+                                    <a href="{{ url_for('delete_entry', data_type=data_type, id=sentence[0]) }}" class="btn btn-danger">Delete</a>
+                                </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                
           </table>
         </tbody>
       </table>

@@ -226,7 +226,32 @@
               <label for="alias">Alias:</label>
               <input type="text" id="alias" name="alias" required>
           {% endif %}
-
+          {% if data_type == 'sentences' %}
+          <label for="sentence_id">Sentence ID:</label>
+          <input type="text" id="sentence_id" name="sentence_id" required>
+        
+          <label for="start_date">Start Date:</label>
+          <input type="date" id="start_date" name="start_date" required>
+        
+          <label for="end_date">End Date:</label>
+          <input type="date" id="end_date" name="end_date" required>
+        
+          <label for="num_violations">Number of Violations:</label>
+          <input type="text" id="num_violations" name="num_violations" required>
+        
+          <label for="type_of_sentence">Type of Sentence:</label>
+          <select id="type_of_sentence" name="type_of_sentence" required>
+            <option value="J">J</option>
+            <option value="H">H</option>
+            <option value="P">P</option>
+          </select>
+        
+          <label for="criminal_id">Criminal ID:</label>
+          <input type="text" id="criminal_id" name="criminal_id" required>
+        
+          <label for="prob_id">Probation Officer ID:</label>
+          <input type="text" id="prob_id" name="prob_id" required>
+        {% endif %}
           <input type="submit" value="Add {{ data_type.capitalize() }}">
       </form>
   </div>

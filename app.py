@@ -201,6 +201,9 @@ def display(data_type):
             elif data_type == 'aliases':
                 cur.execute("SELECT * FROM Aliases WHERE alias_id = %s", (search_id,))
                 data['aliases'] = cur.fetchall()
+            elif data_type == 'sentences':
+                cur.execute("SELECT * FROM Sentences WHERE sentence_id = %s", (search_id,))
+                data['aliases'] = cur.fetchall()
         else:
             if data_type == 'criminal':
                 cur.execute("SELECT * FROM Criminals")
@@ -229,6 +232,9 @@ def display(data_type):
             elif data_type == 'aliases':
                 cur.execute("SELECT * FROM Aliases")
                 data['aliases'] = cur.fetchall()
+            elif data_type == 'sentences':
+                cur.execute("SELECT * FROM Sentences")
+                data['sentences'] = cur.fetchall()
 
     return render_template('display.html', data=data, data_type=data_type, search_id=search_id)
 
@@ -301,6 +307,15 @@ def add_entry(data_type):
             alias_id = request.form['alias_id']
             criminal_id = request.form['criminal_id']
             alias = request.form['alias']
+        elif data_type == 'sentences':
+            sentence_id = request.form['sentence_id']
+            start_date = request.form['start_date']
+            end_date = request.form['end_date']
+            num_violations = request.form['num_violations']
+            type_of_sentence = request.form['type_of_sentence']
+            criminal_id = request.form['criminal_id']
+            prob_id = request.form['prob_id']
+
 
 
 
@@ -324,6 +339,8 @@ def add_entry(data_type):
                 cur.execute('INSERT INTO CriminalCharges (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (charge_id, crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date))
             elif data_type == 'aliases':
                 cur.execute('INSERT INTO Aliases (alias_id, criminal_id, alias) VALUES (%s, %s, %s)', (alias_id, criminal_id, alias))
+            elif data_type == 'sentences':
+                cur.execute('INSERT INTO Sentences (sentence_id, start_date, end_date, num_violations, type_of_sentence, criminal_id, prob_id) VALUES (%s, %s, %s,%s, %s, %s,%s)', (sentence_id, start_date, end_date, num_violations, type_of_sentence, criminal_id, prob_id))
             else:
                 flash('Invalid data type specified.', 'error')
                 return redirect(url_for('index'))
@@ -388,6 +405,10 @@ def delete_entry(data_type, id, id2=None):
     elif data_type == "aliases":
         with mysql.cursor() as cur:
             cur.execute('DELETE FROM Aliases WHERE alias_id = %s', (id,))
+    elif data_type == "sentences":
+        with mysql.cursor() as cur:
+            cur.execute('DELETE FROM Sentences WHERE sentence_id = %s', (id,))
+
 
     mysql.commit()
 
@@ -505,6 +526,18 @@ def update_entry(data_type, id, id2=None):
 
             with mysql.cursor() as cur:
                 cur.execute('UPDATE Aliases SET alias_id = %s, criminal_id = %s, alias = %s WHERE alias_id = %s', (alias_id, criminal_id, alias, id))
+        elif data_type == 'sentences':
+            sentence_id = request.form['sentence_id']
+            start_date = request.form['start_date']
+            end_date = request.form['end_date']
+            num_violations = request.form['num_violations']
+            type_of_sentence = request.form['type_of_sentence']
+            criminal_id = request.form['criminal_id']
+            prob_id = request.form['prob_id']
+
+            with mysql.cursor() as cur:
+                cur.execute('UPDATE Sentences SET sentence_id = %s, start_date = %s, end_date = %s, num_violations = %s, type_of_sentence = %s, criminal_id = %s, prob_id = %s WHERE sentence_id = %s', (sentence_id, start_date, end_date, num_violations, type_of_sentence, criminal_id, prob_id, id))
+
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))
@@ -533,6 +566,8 @@ def update_entry(data_type, id, id2=None):
             cur.execute('SELECT * FROM CriminalCharges WHERE charge_id = %s', (id,))
         elif data_type == 'aliases':
             cur.execute('SELECT * FROM Aliases WHERE alias_id = %s', (id,))
+        elif data_type == 'sentences':
+            cur.execute('SELECT * FROM Sentences WHERE sentence_id = %s', (id,))
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))
