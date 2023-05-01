@@ -509,7 +509,7 @@ def update_entry(data_type, id, id2=None):
                     UPDATE Crime_Codes
                     SET code_description = %s
                     WHERE crime_code = %s
-                """, (crime_code, code_description, id))
+                """, (code_description, id))
         elif data_type == 'crime_officer':
             crime_id = request.form['crime_id']
             officer_id = request.form['officer_id']
