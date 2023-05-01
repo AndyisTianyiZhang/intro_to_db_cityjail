@@ -113,8 +113,6 @@
           </div>
           {% endif %}
           {% if data_type == 'crime_code' %}
-          <label for="crime_code">Crime Code:</label>
-          <input type="text" id="crime_code" name="crime_code" value="{{ entry[0] }}" required>
 
           <label for="code_description">Code Description:</label>
           <input type="text" id="code_description" name="code_description" value="{{ entry[1] }}" required>
@@ -173,6 +171,8 @@
           </select>
           {% endif %}
           {% if data_type == 'criminal_charges' %}      
+          <label for="crime_id">Crime ID:</label>
+          <input type="text" id="crime_id" name="crime_id" value="{{ entry[1] }}" required>
         
           <label for="crime_code">Crime Code:</label>
           <input type="text" id="crime_code" name="crime_code" value="{{ entry[2] }}" required>
