@@ -11,13 +11,35 @@ app.static_folder = 'static'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Creating a MySQL database connection
-mysql = pymysql.connect(
-    host='localhost',
-    user='root',
-    password='',
-    database='city_jail'
-)
+app.config['MYSQL_ROOT'] = {
+    'host': 'localhost',
+    'user': 'developer',
+    'password': 'developer_password',
+    'database': 'city_jail'
+}
+
+app.config['MYSQL_DEVELOPER'] = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '',
+    'database': 'city_jail'
+}
+
+app.config['MYSQL_READONLY'] = {
+    'host': 'localhost',
+    'user': 'user',
+    'password': 'user_password',
+    'database': 'city_jail'
+}
+
+# def get_db_connection():
+#     return pymysql.connect(**app.config['MYSQL_ROOT'])
+
+def get_db_connection(admin=False):
+    if admin:
+        return pymysql.connect(**app.config['MYSQL_DEVELOPER'])
+    else:
+        return pymysql.connect(**app.config['MYSQL_READONLY'])
 
 # User class for Flask-Login
 class User(UserMixin):
@@ -29,7 +51,8 @@ class User(UserMixin):
 
     @staticmethod
     def get(user_id):
-        cur = mysql.cursor()
+        conn = get_db_connection()
+        cur = conn.cursor()
         cur.execute('SELECT * FROM users WHERE id=%s', (user_id,))
         result = cur.fetchone()
         cur.close()
@@ -77,7 +100,8 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        cur = mysql.cursor()
+        conn = get_db_connection()
+        cur = conn.cursor()
         cur.execute('SELECT * FROM users WHERE username=%s AND password=%s', (username, password))
         result = cur.fetchone()
         cur.close()
@@ -110,8 +134,9 @@ def signup():
     if password != confirm_password:
         flash('Passwords do not match', 'error')
         return redirect(url_for('signup_page'))
-
-    cur = mysql.cursor()
+    
+    conn = get_db_connection(True)
+    cur = conn.cursor()
     cur.execute('SELECT * FROM users WHERE username=%s', (username,))
     result = cur.fetchone()
 
@@ -120,7 +145,7 @@ def signup():
         return redirect(url_for('signup_page'))
 
     cur.execute('INSERT INTO users (username, password) VALUES (%s, %s)', (username, password))
-    mysql.commit()
+    conn.commit()
     cur.close()
 
     flash('Account created successfully! Please log in.', 'success')
@@ -152,7 +177,9 @@ def search():
         first_name = request.form['first_name']
         last_name = request.form['last_name']
 
-        with mysql.cursor() as cur:
+
+        conn = get_db_connection(True)
+        with conn.cursor() as cur:
             cur.callproc('GetCriminalDetails', (first_name, last_name))
             result = cur.fetchall()
         
@@ -170,7 +197,12 @@ def display(data_type):
     search_id = None
     data = {}
 
-    with mysql.cursor() as cur:
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
+
+    with conn.cursor() as cur:
         if request.method == 'POST' and request.form.get('action') == 'search':
             search_id = request.form.get('search_id')
             if data_type == 'criminal':
@@ -242,6 +274,11 @@ def display(data_type):
 @login_required
 @admin_required
 def add_entry(data_type):
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
+
     if request.method == 'POST':
         # Retrieve form data
         if data_type == 'criminal':
@@ -320,7 +357,7 @@ def add_entry(data_type):
 
 
         # Insert new entry into database
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             if data_type == 'criminal':
                 cur.execute('INSERT INTO Criminals (criminal_ID, l_name, f_name, street, city, state, zip, phone_num, V_status, P_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', (id, l_name, f_name, street, city, state, zip, phone_num, v_status, p_status))
             elif data_type == 'officer':
@@ -345,7 +382,7 @@ def add_entry(data_type):
                 flash('Invalid data type specified.', 'error')
                 return redirect(url_for('index'))
             
-            mysql.commit()
+            conn.commit()
 
         flash(f'New {data_type[:-1]} added successfully!', 'success')
         return redirect(url_for('display', data_type=data_type))
@@ -357,8 +394,13 @@ def add_entry(data_type):
 @login_required
 @admin_required
 def delete_entry(data_type, id, id2=None):
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
+
     if data_type == "criminal":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM Aliases WHERE criminal_ID = %s', (id,))
             cur.execute('DELETE FROM Sentences WHERE criminal_ID = %s', (id,))
             
@@ -373,44 +415,44 @@ def delete_entry(data_type, id, id2=None):
         
             cur.execute('DELETE FROM Criminals WHERE criminal_ID = %s', (id,))
     elif data_type == "officer":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM Crime_Officers WHERE officer_id = %s', (id,))
             cur.execute('DELETE FROM Officers WHERE officer_id = %s', (id,))
     elif data_type == "prob_officer":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM Sentences WHERE prob_id = %s', (id,))
             cur.execute('DELETE FROM Prob_officers WHERE prob_id = %s', (id,))
     elif data_type == "crime_code":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM CriminalCharges WHERE crime_code = %s', (id,))
             cur.execute('DELETE FROM Crime_Codes WHERE crime_code = %s', (id,))
     elif data_type == 'crime_officer':
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute("""
                 DELETE FROM Crime_Officers
                 WHERE crime_id = %s AND officer_id = %s
             """, (id, id2))
     elif data_type == "crime":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM Appeals WHERE crime_id = %s', (id,))
             cur.execute('DELETE FROM CriminalCharges WHERE crime_id = %s', (id,))
             cur.execute('DELETE FROM Crime_Officers WHERE crime_id = %s', (id,))
             cur.execute('DELETE FROM Crimes WHERE crime_id = %s', (id,))
     elif data_type == "appeal":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM Appeals WHERE appeal_id = %s', (id,))
     elif data_type == "criminal_charges":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM CriminalCharges WHERE charge_id = %s', (id,))
     elif data_type == "aliases":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM Aliases WHERE alias_id = %s', (id,))
     elif data_type == "sentences":
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('DELETE FROM Sentences WHERE sentence_id = %s', (id,))
 
 
-    mysql.commit()
+    conn.commit()
 
     flash(f'{data_type} deleted successfully!', 'success')
     return redirect(url_for('display', data_type=data_type))
@@ -421,6 +463,11 @@ def delete_entry(data_type, id, id2=None):
 @login_required
 @admin_required
 def update_entry(data_type, id, id2=None):
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
+
     if request.method == 'POST':
         if data_type == 'criminal':
             l_name = request.form['l_name']
@@ -432,7 +479,7 @@ def update_entry(data_type, id, id2=None):
             zip = request.form['zip']
             v_status = request.form['v_status']
             p_status = request.form['p_status']
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Criminals
                     SET l_name = %s, f_name = %s, street = %s, city = %s, state = %s, zip = %s, phone_num = %s, V_status = %s, P_status = %s
@@ -445,7 +492,7 @@ def update_entry(data_type, id, id2=None):
             precinct = request.form['precinct']
             badge = request.form['badge']
             status = request.form['status']
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Officers
                     SET last = %s, first = %s, precinct = %s, badge = %s, phone = %s, status = %s
@@ -458,7 +505,7 @@ def update_entry(data_type, id, id2=None):
             zip = request.form['zip']
             email = request.form['email']
             status = request.form['status']
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Prob_officers
                     SET last_name = %s, first_name = %s, street = %s, city = %s, state = %s, zip = %s, phone = %s, email = %s, status = %s
@@ -467,7 +514,7 @@ def update_entry(data_type, id, id2=None):
         elif data_type == 'crime_code':
             crime_code = request.form['crime_code']
             code_description = request.form['code_description']
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Crime_Codes
                     SET crime_code = %s, code_description = %s
@@ -476,7 +523,7 @@ def update_entry(data_type, id, id2=None):
         elif data_type == 'crime_officer':
             crime_id = request.form['crime_id']
             officer_id = request.form['officer_id']
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Crime_Officers
                     SET crime_id = %s, officer_id = %s
@@ -490,7 +537,7 @@ def update_entry(data_type, id, id2=None):
             status = request.form['status']
             hearing_date = request.form['hearing_date']
             appeal_cutoff_date = request.form['appeal_cutoff_date']
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Crimes
                     SET criminal_id = %s, classification = %s, date_charged = %s, status = %s, hearing_date = %s, appeal_cutoff_date = %s
@@ -501,7 +548,7 @@ def update_entry(data_type, id, id2=None):
             filing_date = request.form['filing_date']
             hearing_date = request.form['hearing_date']
             status = request.form['status']
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Appeals
                     SET crime_id = %s, filing_date = %s, hearing_date = %s, status = %s
@@ -518,13 +565,13 @@ def update_entry(data_type, id, id2=None):
             amount_paid = request.form['amount_paid']
             pay_due_date = request.form['pay_due_date']
 
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute('UPDATE CriminalCharges SET crime_id = %s, crime_code = %s, charge_status = %s, fine_amount = %s, court_fee = %s, amount_paid = %s, pay_due_date = %s WHERE charge_id = %s', (crime_id, crime_code, charge_status, fine_amount, court_fee, amount_paid, pay_due_date, id))
         elif data_type == 'aliases':
             criminal_id = request.form['criminal_id']
             alias = request.form['alias']
 
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute('UPDATE Aliases SET criminal_id = %s, alias = %s WHERE alias_id = %s', (criminal_id, alias, id))
         elif data_type == 'sentences':
             start_date = request.form['start_date']
@@ -534,19 +581,19 @@ def update_entry(data_type, id, id2=None):
             criminal_id = request.form['criminal_id']
             prob_id = request.form['prob_id']
 
-            with mysql.cursor() as cur:
+            with conn.cursor() as cur:
                 cur.execute('UPDATE Sentences SET start_date = %s, end_date = %s, num_violations = %s, type_of_sentence = %s, criminal_id = %s, prob_id = %s WHERE sentence_id = %s', (start_date, end_date, num_violations, type_of_sentence, criminal_id, prob_id, id))
 
         else:
             flash(f'Invalid data type: {data_type}', 'danger')
             return redirect(url_for('index'))
 
-        mysql.commit()
+        conn.commit()
 
         flash(f'{data_type[:-1].capitalize()} information updated successfully!', 'success')
         return redirect(url_for('display', data_type=data_type))
 
-    with mysql.cursor() as cur:
+    with conn.cursor() as cur:
         if data_type == 'criminal':
             cur.execute("SELECT * FROM Criminals WHERE criminal_ID = %s", (id,))
         elif data_type == 'officer':
@@ -580,7 +627,12 @@ def update_entry(data_type, id, id2=None):
 @app.route('/all_user')
 @login_required
 def all_user():
-    with mysql.cursor() as cur:
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
+
+    with conn.cursor() as cur:
         cur.execute("SELECT * FROM users;")
         result = cur.fetchall()
 
@@ -591,6 +643,10 @@ def all_user():
 @login_required
 @admin_required
 def add_user():
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
     if request.method == 'POST':
         # Retrieve form data
         username = request.form['username']
@@ -598,9 +654,9 @@ def add_user():
         role = request.form['role']
 
         # Insert new user into the database
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute('INSERT INTO users (username, password, role) VALUES (%s, %s, %s)', (username, password, role))
-            mysql.commit()
+            conn.commit()
 
         flash('New user added successfully!', 'success')
         return redirect(url_for('all_user'))
@@ -611,9 +667,13 @@ def add_user():
 @login_required
 @admin_required
 def delete_user(user_id):
-    with mysql.cursor() as cur:
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
+    with conn.cursor() as cur:
         cur.execute('DELETE FROM users WHERE id = %s', (user_id,))
-        mysql.commit()
+        conn.commit()
 
     flash('User deleted successfully!', 'success')
     return redirect(url_for('all_user'))
@@ -622,23 +682,27 @@ def delete_user(user_id):
 @login_required
 @admin_required
 def update_user(user_id):
+    if current_user.is_admin:
+        conn = get_db_connection(True)
+    else:
+        conn = get_db_connection()
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         role = request.form['role']
 
-        with mysql.cursor() as cur:
+        with conn.cursor() as cur:
             cur.execute("""
                 UPDATE users
                 SET username = %s, password = %s, role = %s
                 WHERE id = %s
             """, (username, password, role, user_id))
-            mysql.commit()
+            conn.commit()
 
         flash('User information updated successfully!', 'success')
         return redirect(url_for('all_user'))
 
-    with mysql.cursor() as cur:
+    with conn.cursor() as cur:
         cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
         user = cur.fetchone()
 
