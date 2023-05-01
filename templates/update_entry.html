@@ -200,6 +200,9 @@
           {% endif %}
 
           {% if data_type == 'aliases' %}
+          <label for="alias_id">Aliases ID:</label>
+          <input type="text" id="alias_id" name="alias_id" value="{{ entry[0] }}" required>
+
           <label for="criminal_id">Criminal ID:</label>
           <input type="text" id="criminal_id" name="criminal_id" value="{{ entry[1] }}" required>
 
