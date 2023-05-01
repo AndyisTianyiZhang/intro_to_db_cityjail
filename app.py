@@ -490,6 +490,8 @@ def update_entry(data_type, id, id2=None):
                     WHERE officer_ID = %s
                 """, (l_name, f_name, precinct, badge, phone_num, status, id))
         elif data_type == 'prob_officer':
+            l_name = request.form['l_name']
+            f_name = request.form['f_name']
             street = request.form['street']
             city = request.form['city']
             state = request.form['state']
