@@ -494,6 +494,7 @@ def update_entry(data_type, id, id2=None):
             f_name = request.form['f_name']
             street = request.form['street']
             city = request.form['city']
+            phone_num = request.form['phone_num']
             state = request.form['state']
             zip = request.form['zip']
             email = request.form['email']
