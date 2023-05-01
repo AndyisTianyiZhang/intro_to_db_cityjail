@@ -503,12 +503,11 @@ def update_entry(data_type, id, id2=None):
                     WHERE prob_id = %s
                 """, (l_name, f_name, street, city, state, zip, phone_num, email, status, id))
         elif data_type == 'crime_code':
-            crime_code = request.form['crime_code']
             code_description = request.form['code_description']
             with conn.cursor() as cur:
                 cur.execute("""
                     UPDATE Crime_Codes
-                    SET crime_code = %s, code_description = %s
+                    SET code_description = %s
                     WHERE crime_code = %s
                 """, (crime_code, code_description, id))
         elif data_type == 'crime_officer':
