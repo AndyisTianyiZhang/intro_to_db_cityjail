@@ -11,19 +11,13 @@ app.static_folder = 'static'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-app.config['MYSQL_ROOT'] = {
+app.config['MYSQL_DEVELOPER'] = {
     'host': 'localhost',
     'user': 'developer',
     'password': 'developer_password',
     'database': 'city_jail'
 }
 
-app.config['MYSQL_DEVELOPER'] = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
-    'database': 'city_jail'
-}
 
 app.config['MYSQL_READONLY'] = {
     'host': 'localhost',
@@ -31,9 +25,6 @@ app.config['MYSQL_READONLY'] = {
     'password': 'user_password',
     'database': 'city_jail'
 }
-
-# def get_db_connection():
-#     return pymysql.connect(**app.config['MYSQL_ROOT'])
 
 def get_db_connection(admin=False):
     if admin:
